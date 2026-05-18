@@ -5969,21 +5969,43 @@ function VerminordDoc() {
 
   const activePartnerData = RIPPLE_PARTNERS.find((p) => p.id === activePartner);
 
-  const sections = [
-    { id: 'intro', label: 'Intro' },
-    { id: 'process', label: 'Slik gjør vi det' },
-    { id: 'raavarer', label: 'Råvarer' },
-    { id: 'forkompostering', label: 'Forkompostering' },
-    { id: 'wedge', label: 'Wedge' },
-    { id: 'cft', label: 'CFT' },
-    { id: 'produksjon', label: 'Produksjonsflyt' },
-    { id: 'eisenia', label: 'Eisenia fetida' },
-    { id: 'lab-dashboard', label: 'Lab-dashboard' },
-    { id: 'lab', label: 'Lab-data' },
-    { id: 'bruk', label: 'Bruksguide' },
-    { id: 'sesong', label: 'Sesongkalender' },
-    { id: 'ripples', label: 'Ringvirkninger' },
-  ]
+  const sectionGroups = [
+    {
+      label: 'Oversikt',
+      items: [
+        { id: 'intro', label: 'Intro' },
+        { id: 'process', label: 'Prosessen' },
+      ],
+    },
+    {
+      label: 'Produksjon',
+      items: [
+        { id: 'raavarer', label: 'Råvarer' },
+        { id: 'forkompostering', label: 'Forkompostering' },
+        { id: 'wedge', label: 'Wedge' },
+        { id: 'cft', label: 'CFT' },
+        { id: 'produksjon', label: 'Produksjonsflyt' },
+      ],
+    },
+    {
+      label: 'Dokumentasjon',
+      items: [
+        { id: 'eisenia', label: 'Eisenia fetida' },
+        { id: 'lab-dashboard', label: 'Lab-dashboard' },
+        { id: 'lab', label: 'Lab-data' },
+      ],
+    },
+    {
+      label: 'Bruk & sesong',
+      items: [
+        { id: 'bruk', label: 'Bruksguide' },
+        { id: 'sesong', label: 'Sesongkalender' },
+        { id: 'ripples', label: 'Ringvirkninger' },
+      ],
+    },
+  ];
+
+  const sections = sectionGroups.flatMap((g) => g.items);
 
   return (
     <div
@@ -6088,8 +6110,8 @@ function VerminordDoc() {
             top: 0,
             background: palette.bg,
             zIndex: 20,
-            paddingTop: 18,
-            paddingBottom: 12,
+            paddingTop: 16,
+            paddingBottom: 14,
             marginBottom: 4,
             borderBottom: `1px solid ${palette.line}`,
           }}
@@ -6098,54 +6120,58 @@ function VerminordDoc() {
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
+              gap: 10,
+              marginBottom: 14,
             }}
           >
             <div
               style={{
                 fontFamily: '"Fraunces", serif',
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: 500,
                 color: palette.ink,
-                letterSpacing: '-0.01em',
+                letterSpacing: '-0.015em',
               }}
             >
               Verminord
             </div>
+            <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: palette.muted, fontWeight: 500 }}>
+              Interaktiv guide
+            </div>
           </div>
-          <div
-            style={{
-              display: 'flex',
-              gap: 4,
-              marginTop: 12,
-              flexWrap: 'wrap',
-              overflowX: 'auto',
-            }}
-          >
-            {sections.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => {
-                  setActiveSection(s.id);
-                  const el = document.getElementById(`section-${s.id}`);
-                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                style={{
-                  padding: '6px 12px',
-                  background: 'transparent',
-                  border: 'none',
-                  fontSize: 11.5,
-                  color: palette.inkSoft,
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                  fontWeight: 500,
-                  letterSpacing: '0.02em',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {s.label}
-              </button>
+          <div style={{ display: 'flex', gap: 0, flexWrap: 'wrap', alignItems: 'center' }}>
+            {sectionGroups.map((group, gi) => (
+              <React.Fragment key={group.label}>
+                {gi > 0 && (
+                  <div style={{ width: 1, height: 14, background: palette.line, margin: '0 6px', flexShrink: 0 }} />
+                )}
+                {group.items.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => {
+                      setActiveSection(s.id);
+                      const el = document.getElementById(`section-${s.id}`);
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    style={{
+                      padding: '5px 10px',
+                      background: activeSection === s.id ? palette.ink : 'transparent',
+                      border: 'none',
+                      borderRadius: 3,
+                      fontSize: 11,
+                      color: activeSection === s.id ? palette.bg : palette.inkSoft,
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      fontWeight: 500,
+                      letterSpacing: '0.02em',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </React.Fragment>
             ))}
           </div>
         </nav>
@@ -6192,6 +6218,7 @@ function VerminordDoc() {
           >
             Et lite anlegg på Klepp Stasjon. Lokale råvarer, dokumenterte resultater og
             ringvirkninger som strekker seg langt utenfor vår egen drift. Her er hele bildet.
+            {' '}Dette er en interaktiv side — utforsk fritt, trykk på det som fanger oppmerksomheten, og se hva som dukker opp.
           </p>
 
           {/* Three-stat hero */}
