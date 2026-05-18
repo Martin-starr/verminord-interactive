@@ -359,15 +359,15 @@ function SectionHeader({ number, label, children, italicTitle }) {
           gap: 10,
         }}
       >
-        <span style={{ fontFamily: 'monospace', color: palette.muted, fontSize: 11 }}>{number}</span>
+        <span style={{ fontFamily: '"IBM Plex Sans", sans-serif', color: palette.muted, fontSize: 11 }}>{number}</span>
         <span style={{ display: 'inline-block', width: 24, height: 1, background: palette.warm }} />
         {label}
       </div>
       <h2
         style={{
-          fontFamily: '"Fraunces", serif',
-          fontSize: 'clamp(28px, 6vw, 36px)',
-          fontWeight: 400,
+          fontFamily: '"IBM Plex Sans", sans-serif',
+          fontSize: 'clamp(32px, 6vw, 40px)',
+          fontWeight: 700,
           margin: 0,
           letterSpacing: '-0.015em',
           color: palette.ink,
@@ -397,15 +397,15 @@ function NutrientCard({ nutrient, isExpanded, onToggle, time }) {
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 16 }}>
         <div>
-          <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: palette.muted, fontWeight: 600, marginBottom: 4, fontFamily: 'monospace' }}>
+          <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: palette.muted, fontWeight: 600, marginBottom: 4, fontFamily: '"IBM Plex Sans", sans-serif' }}>
             {nutrient.method}
           </div>
-          <div style={{ fontFamily: '"Fraunces", serif', fontSize: 19, fontWeight: 500, color: palette.ink, letterSpacing: '-0.005em' }}>
+          <div style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 19, fontWeight: 500, color: palette.ink, letterSpacing: '-0.005em' }}>
             {nutrient.name}
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <div style={{ fontFamily: '"Fraunces", serif', fontSize: 40, fontWeight: 400, color: palette.ink, letterSpacing: '-0.025em', transform: `scale(${breath})`, transformOrigin: 'right baseline', fontVariationSettings: '"opsz" 144' }}>
+          <div style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 40, fontWeight: 400, color: palette.ink, letterSpacing: '-0.025em', transform: `scale(${breath})`, transformOrigin: 'right baseline', fontVariationSettings: '"opsz" 144' }}>
             {nutrient.value}
           </div>
           {nutrient.unit && <div style={{ fontSize: 18, color: palette.muted, fontWeight: 500 }}>{nutrient.unit}</div>}
@@ -430,12 +430,12 @@ function NutrientCard({ nutrient, isExpanded, onToggle, time }) {
             <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: palette.petrol, fontWeight: 600, marginBottom: 6 }}>
               Hvorfor det betyr noe
             </div>
-            <div style={{ fontSize: 14, color: palette.inkSoft, lineHeight: 1.55, fontFamily: '"Fraunces", serif', fontStyle: 'italic' }}>
+            <div style={{ fontSize: 14, color: palette.inkSoft, lineHeight: 1.55, fontFamily: '"IBM Plex Sans", sans-serif', fontStyle: 'italic' }}>
               {nutrient.whyItMatters}
             </div>
           </div>
           {nutrient.context && (
-            <div style={{ marginTop: 14, padding: '12px 14px', background: palette.paper, borderLeft: `3px solid ${palette.warm}`, fontSize: 13, color: palette.warmDark, lineHeight: 1.55, fontFamily: '"Fraunces", serif', fontStyle: 'italic' }}>
+            <div style={{ marginTop: 14, padding: '12px 14px', background: palette.paper, borderLeft: `3px solid ${palette.warm}`, fontSize: 13, color: palette.warmDark, lineHeight: 1.55, fontFamily: '"IBM Plex Sans", sans-serif', fontStyle: 'italic' }}>
               {nutrient.context}
             </div>
           )}
@@ -474,7 +474,7 @@ function CompareBar({ label, value, max, color, primary }) {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4, fontSize: 12 }}>
         <span style={{ color: primary ? palette.ink : palette.muted, fontWeight: primary ? 600 : 500 }}>{label}</span>
-        <span style={{ fontFamily: '"Fraunces", serif', color: primary ? palette.ink : palette.muted, fontWeight: primary ? 500 : 400 }}>{value}%</span>
+        <span style={{ fontFamily: '"IBM Plex Sans", sans-serif', color: primary ? palette.ink : palette.muted, fontWeight: primary ? 500 : 400 }}>{value}%</span>
       </div>
       <div style={{ height: 8, background: palette.paperDark, borderRadius: 4, overflow: 'hidden' }}>
         <div style={{ height: '100%', width: `${pct}%`, background: color, transition: 'width 1.8s cubic-bezier(0.22, 1, 0.36, 1)' }} />
@@ -499,10 +499,10 @@ function HeavyMetalBar({ metal, isExpanded, onToggle, delay, visible }) {
     <div style={{ marginBottom: 16, padding: '14px 0', cursor: 'pointer', borderBottom: `1px solid ${palette.line}` }} onClick={onToggle} className="expandable-card">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <span style={{ fontFamily: '"Fraunces", serif', fontSize: 17, fontWeight: 500, color: palette.ink }}>{metal.name}</span>
-          <span style={{ fontFamily: 'monospace', fontSize: 11, color: palette.muted, fontWeight: 500 }}>{metal.symbol}</span>
+          <span style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 17, fontWeight: 500, color: palette.ink }}>{metal.name}</span>
+          <span style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 11, color: palette.muted, fontWeight: 500 }}>{metal.symbol}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, fontFamily: 'monospace', fontSize: 11.5 }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 11.5 }}>
           <span style={{ color: palette.ink, fontWeight: 600 }}>{metal.measured}</span>
           <span style={{ color: palette.muted }}>/ {metal.limit}</span>
         </div>
@@ -516,7 +516,7 @@ function HeavyMetalBar({ metal, isExpanded, onToggle, delay, visible }) {
           <span style={{ color: metal.severity === 'high' ? palette.petrol : palette.moss, fontWeight: 600 }}>
             {targetPct < 5 ? '< 5%' : `${targetPct.toFixed(0)}%`} av grensen
           </span>
-          <span style={{ color: palette.warm, fontWeight: 600, fontStyle: 'italic', fontFamily: '"Fraunces", serif', fontSize: 11 }}>
+          <span style={{ color: palette.warm, fontWeight: 600, fontStyle: 'italic', fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 11 }}>
             {headroomPct.toFixed(0)}% margin
           </span>
         </div>
@@ -524,7 +524,7 @@ function HeavyMetalBar({ metal, isExpanded, onToggle, delay, visible }) {
       <div style={{ maxHeight: isExpanded ? 300 : 0, overflow: 'hidden', transition: 'max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1)' }} className="expandable-content">
         <div style={{ paddingTop: 14 }}>
           <div style={{ fontSize: 13, color: palette.inkSoft, lineHeight: 1.55, marginBottom: 10 }}>{metal.whatItIs}</div>
-          <div style={{ fontSize: 13, color: palette.inkSoft, lineHeight: 1.55, fontFamily: '"Fraunces", serif', fontStyle: 'italic' }}>{metal.whyItMatters}</div>
+          <div style={{ fontSize: 13, color: palette.inkSoft, lineHeight: 1.55, fontFamily: '"IBM Plex Sans", sans-serif', fontStyle: 'italic' }}>{metal.whyItMatters}</div>
           {metal.atDetectionLimit && (
             <div style={{ marginTop: 12, padding: '10px 12px', background: palette.paper, borderLeft: `3px solid ${palette.moss}`, fontSize: 12, color: palette.moss, fontWeight: 600, letterSpacing: '0.04em' }}>
               ✓ Knapt målbart — på deteksjonsgrensen
@@ -555,8 +555,8 @@ function PetriDish({ time, label, status, detail }) {
           <path d="M -7 1 L -2 6 L 8 -6" stroke={palette.moss} strokeWidth="2.2" fill="none" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
         </svg>
         <div style={{ flex: 1 }}>
-          <div style={{ fontFamily: '"Fraunces", serif', fontSize: 16, fontWeight: 500, color: palette.ink, marginBottom: 2 }}>{label}</div>
-          <div style={{ fontFamily: '"Fraunces", serif', fontSize: 14, fontStyle: 'italic', color: palette.moss, fontWeight: 500 }}>{status}</div>
+          <div style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 16, fontWeight: 500, color: palette.ink, marginBottom: 2 }}>{label}</div>
+          <div style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 14, fontStyle: 'italic', color: palette.moss, fontWeight: 500 }}>{status}</div>
         </div>
       </div>
       <div style={{ fontSize: 12.5, color: palette.inkSoft, lineHeight: 1.55 }}>{detail}</div>
@@ -582,12 +582,12 @@ function ProcessStepCard({ step, index, isActive, onToggle, time }) {
       onClick={onToggle}
       className="process-step expandable-card"
     >
-      <div style={{ padding: '20px 18px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+      <div style={{ padding: '24px 22px', display: 'flex', gap: 18, alignItems: 'flex-start' }}>
         {/* Illustration */}
         <div
           style={{
-            width: 64,
-            height: 64,
+            width: 72,
+            height: 72,
             flexShrink: 0,
             background: palette.bg,
             borderRadius: 4,
@@ -615,15 +615,15 @@ function ProcessStepCard({ step, index, isActive, onToggle, time }) {
               alignItems: 'center',
             }}
           >
-            <span style={{ fontFamily: 'monospace', color: palette.muted }}>{step.number}</span>
+            <span style={{ fontFamily: '"IBM Plex Sans", sans-serif', color: palette.muted }}>{step.number}</span>
             <span style={{ display: 'inline-block', width: 14, height: 1, background: palette.warm }} />
             {step.short}
           </div>
           <div
             style={{
-              fontFamily: '"Fraunces", serif',
-              fontSize: 19,
-              fontWeight: 500,
+              fontFamily: '"IBM Plex Sans", sans-serif',
+              fontSize: 20,
+              fontWeight: 600,
               color: palette.ink,
               marginBottom: 4,
               letterSpacing: '-0.005em',
@@ -637,7 +637,7 @@ function ProcessStepCard({ step, index, isActive, onToggle, time }) {
               color: palette.petrol,
               fontWeight: 600,
               letterSpacing: '0.08em',
-              fontFamily: 'monospace',
+              fontFamily: '"IBM Plex Sans", sans-serif',
             }}
           >
             {step.duration}
@@ -677,7 +677,7 @@ function ProcessStepCard({ step, index, isActive, onToggle, time }) {
               fontSize: 13,
               color: palette.warmDark,
               lineHeight: 1.55,
-              fontFamily: '"Fraunces", serif',
+              fontFamily: '"IBM Plex Sans", sans-serif',
               fontStyle: 'italic',
               marginBottom: 14,
             }}
@@ -708,7 +708,7 @@ function ProcessStepCard({ step, index, isActive, onToggle, time }) {
               style={{
                 fontSize: 14,
                 lineHeight: 1.5,
-                fontFamily: '"Fraunces", serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 fontStyle: 'italic',
                 fontWeight: 400,
               }}
@@ -755,7 +755,7 @@ function ProcessIllustration({ step, time, active }) {
         <path d="M -18 14 Q -16 -4 0 -8 Q 16 -4 18 14 Z" fill={palette.warmDark} opacity="0.85" />
         <path d="M -14 10 Q -10 0 -2 -2" stroke={palette.bg} strokeWidth="0.8" fill="none" opacity="0.4" />
         {/* Temp indicator */}
-        <text x={0} y={20} textAnchor="middle" style={{ fontSize: 7, fill: palette.ink, fontFamily: 'monospace', fontWeight: 700 }}>
+        <text x={0} y={20} textAnchor="middle" style={{ fontSize: 7, fill: palette.ink, fontFamily: '"IBM Plex Sans", sans-serif', fontWeight: 700 }}>
           55°+
         </text>
       </svg>
@@ -816,13 +816,13 @@ function ProcessIllustration({ step, time, active }) {
       <text x={0} y={4} textAnchor="middle" style={{ fontSize: 6, fontWeight: 700, fill: palette.ink, fontFamily: 'sans-serif' }}>
         CAST
       </text>
-      <text x={0} y={12} textAnchor="middle" style={{ fontSize: 4, fill: palette.ink, fontFamily: 'monospace', letterSpacing: '0.06em' }}>
+      <text x={0} y={12} textAnchor="middle" style={{ fontSize: 4, fill: palette.ink, fontFamily: '"IBM Plex Sans", sans-serif', letterSpacing: '0.06em' }}>
         5L
       </text>
       {/* Stamp */}
       <g transform={`translate(13, -18) rotate(${-8 + Math.sin(time * 2) * 2 * animMult})`}>
         <circle r={7} fill="none" stroke={palette.warmDark} strokeWidth="1.2" />
-        <text y={2} textAnchor="middle" style={{ fontSize: 5, fontWeight: 700, fill: palette.warmDark, fontFamily: 'monospace' }}>
+        <text y={2} textAnchor="middle" style={{ fontSize: 5, fontWeight: 700, fill: palette.warmDark, fontFamily: '"IBM Plex Sans", sans-serif' }}>
           #001
         </text>
       </g>
@@ -884,7 +884,7 @@ function RippleDiagram({ activePartner, setActivePartner, time }) {
         {/* Center */}
         <g>
           <circle cx={CX} cy={CY} r="54" fill={palette.petrol} />
-          <text x={CX} y={CY - 2} textAnchor="middle" fill={palette.bg} style={{ fontFamily: '"Fraunces", serif', fontSize: 15, fontWeight: 500 }}>
+          <text x={CX} y={CY - 2} textAnchor="middle" fill={palette.bg} style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 15, fontWeight: 500 }}>
             Verminord
           </text>
           <text x={CX} y={CY + 14} textAnchor="middle" fill={palette.bg} opacity="0.65" style={{ fontSize: 7, letterSpacing: '0.28em', textTransform: 'uppercase', fontWeight: 500 }}>
@@ -963,7 +963,7 @@ function PartnerDetail({ partner }) {
       </div>
       <h3
         style={{
-          fontFamily: '"Fraunces", serif',
+          fontFamily: '"IBM Plex Sans", sans-serif',
           fontSize: 26,
           fontWeight: 500,
           color: palette.ink,
@@ -980,7 +980,7 @@ function PartnerDetail({ partner }) {
         <div style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: palette.warm, fontWeight: 600, marginBottom: 8 }}>
           Hvorfor
         </div>
-        <div style={{ fontSize: 14, color: palette.inkSoft, lineHeight: 1.6, fontFamily: '"Fraunces", serif', fontStyle: 'italic', fontWeight: 400 }}>
+        <div style={{ fontSize: 14, color: palette.inkSoft, lineHeight: 1.6, fontFamily: '"IBM Plex Sans", sans-serif', fontStyle: 'italic', fontWeight: 400 }}>
           {partner.why}
         </div>
       </div>
@@ -1136,7 +1136,7 @@ const RaavarerSection = (() => {
     return (
       <div
         style={{
-          fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+          fontFamily: '"IBM Plex Sans", sans-serif',
           background: palette.bg,
           color: palette.ink,
           minHeight: 'auto',
@@ -1159,14 +1159,13 @@ const RaavarerSection = (() => {
             </div>
             <h1
               style={{
-                fontFamily: '"Fraunces", serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 fontSize: 'clamp(34px, 5.6vw, 64px)',
                 lineHeight: 1.02,
                 margin: '14px 0 0 0',
-                fontWeight: 400,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 maxWidth: 940,
-                fontVariationSettings: '"opsz" 144',
               }}
             >
               Fem ingredienser{' '}
@@ -1174,7 +1173,7 @@ const RaavarerSection = (() => {
                 style={{
                   fontStyle: 'italic',
                   color: palette.petrol,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 fra lokale kilder
@@ -1182,8 +1181,8 @@ const RaavarerSection = (() => {
             </h1>
             <p
               style={{
-                fontSize: 15.5,
-                lineHeight: 1.6,
+                fontSize: 16,
+                lineHeight: 1.7,
                 maxWidth: 680,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -1277,8 +1276,8 @@ const RaavarerSection = (() => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: 14,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: 16,
               marginTop: 36,
             }}
           >
@@ -1295,7 +1294,7 @@ const RaavarerSection = (() => {
                     background: palette.paper,
                     border: `1px solid ${isActive ? m.color : palette.line}`,
                     borderTop: `4px solid ${m.color}`,
-                    padding: '18px 18px',
+                    padding: '22px 22px',
                     cursor: 'pointer',
                     transition: 'all 0.25s ease',
                     transform: isActive || isHover ? 'translateY(-3px)' : 'none',
@@ -1314,8 +1313,8 @@ const RaavarerSection = (() => {
                     {/* swatch */}
                     <div
                       style={{
-                        width: 32,
-                        height: 32,
+                        width: 36,
+                        height: 36,
                         background: m.swatch,
                         border: `1px solid ${palette.ink}`,
                         flexShrink: 0,
@@ -1323,9 +1322,9 @@ const RaavarerSection = (() => {
                     />
                     <div
                       style={{
-                        fontFamily: '"JetBrains Mono", monospace',
-                        fontSize: 12,
-                        fontWeight: 600,
+                        fontFamily: '"IBM Plex Sans", sans-serif',
+                        fontSize: 14,
+                        fontWeight: 700,
                         color: m.color,
                       }}
                     >
@@ -1335,9 +1334,9 @@ const RaavarerSection = (() => {
 
                   <div
                     style={{
-                      fontFamily: '"Fraunces", serif',
-                      fontSize: 19,
-                      fontWeight: 500,
+                      fontFamily: '"IBM Plex Sans", sans-serif',
+                      fontSize: 20,
+                      fontWeight: 600,
                       lineHeight: 1.2,
                       letterSpacing: '-0.01em',
                     }}
@@ -1346,11 +1345,11 @@ const RaavarerSection = (() => {
                   </div>
                   <div
                     style={{
-                      fontSize: 12,
+                      fontSize: 13,
                       fontStyle: 'italic',
-                      fontFamily: '"Fraunces", serif',
+                      fontFamily: '"IBM Plex Sans", sans-serif',
                       color: palette.muted,
-                      marginTop: 4,
+                      marginTop: 6,
                     }}
                   >
                     {m.sub}
@@ -1358,9 +1357,9 @@ const RaavarerSection = (() => {
 
                   <div
                     style={{
-                      marginTop: 14,
+                      marginTop: 16,
                       display: 'flex',
-                      gap: 4,
+                      gap: 6,
                       flexWrap: 'wrap',
                     }}
                   >
@@ -1368,11 +1367,11 @@ const RaavarerSection = (() => {
                       <span
                         key={j}
                         style={{
-                          fontSize: 9.5,
+                          fontSize: 10.5,
                           letterSpacing: '0.08em',
                           textTransform: 'uppercase',
                           fontWeight: 600,
-                          padding: '3px 7px',
+                          padding: '4px 10px',
                           border: `1px solid ${m.color}`,
                           color: m.color,
                         }}
@@ -1391,8 +1390,8 @@ const RaavarerSection = (() => {
               marginTop: 24,
               background: activeMat ? palette.paper : 'transparent',
               border: activeMat ? `1px solid ${palette.line}` : '1px dashed transparent',
-              padding: '28px 30px',
-              minHeight: 180,
+              padding: activeMat ? '28px 30px' : '16px 30px',
+              minHeight: activeMat ? 120 : 0,
               transition: 'all 0.3s ease',
             }}
           >
@@ -1429,7 +1428,7 @@ const RaavarerSection = (() => {
                 </div>
                 <h3
                   style={{
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontSize: 28,
                     lineHeight: 1.18,
                     margin: 0,
@@ -1489,7 +1488,7 @@ const RaavarerSection = (() => {
                         lineHeight: 1.62,
                         margin: 0,
                         color: '#3A3631',
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         fontStyle: 'italic',
                       }}
                     >
@@ -1502,11 +1501,11 @@ const RaavarerSection = (() => {
               <div
                 style={{
                   color: palette.muted,
-                  fontSize: 13.5,
+                  fontSize: 14,
                   textAlign: 'center',
                   fontStyle: 'italic',
-                  fontFamily: '"Fraunces", serif',
-                  paddingTop: 40,
+                  fontFamily: '"IBM Plex Sans", sans-serif',
+                  paddingTop: 8,
                 }}
               >
                 Trykk på et råstoff for å se hva det bidrar med.
@@ -1615,8 +1614,8 @@ const ForkomposteringSection = (() => {
     return (
       <div
         style={{
-          fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
-          background: palette.bg,
+          fontFamily: '"IBM Plex Sans", sans-serif',
+          background: '#FFFFFF',
           color: palette.ink,
           minHeight: 'auto',
           padding: '48px 28px 56px',
@@ -1638,14 +1637,13 @@ const ForkomposteringSection = (() => {
             </div>
             <h1
               style={{
-                fontFamily: '"Fraunces", serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 fontSize: 'clamp(34px, 5.6vw, 64px)',
                 lineHeight: 1.02,
                 margin: '14px 0 0 0',
-                fontWeight: 400,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 maxWidth: 920,
-                fontVariationSettings: '"opsz" 144',
               }}
             >
               Seks steg{' '}
@@ -1653,7 +1651,7 @@ const ForkomposteringSection = (() => {
                 style={{
                   fontStyle: 'italic',
                   color: palette.petrol,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 før marken får sin mat
@@ -1661,8 +1659,8 @@ const ForkomposteringSection = (() => {
             </h1>
             <p
               style={{
-                fontSize: 15.5,
-                lineHeight: 1.6,
+                fontSize: 16,
+                lineHeight: 1.7,
                 maxWidth: 660,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -1748,7 +1746,7 @@ const ForkomposteringSection = (() => {
                 const yNode = Y - Math.sin((i / (steps.length - 1)) * Math.PI) * 50;
                 const isActive = active === s.id;
                 const isHover = hovered === s.id;
-                const r = isActive || isHover ? 36 : 32;
+                const r = isActive || isHover ? 42 : 38;
                 return (
                   <g
                     key={s.id}
@@ -1787,7 +1785,7 @@ const ForkomposteringSection = (() => {
                       textAnchor="middle"
                       fill={isActive ? palette.bg : palette.ink}
                       style={{
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         fontSize: 16,
                         fontWeight: 500,
                         pointerEvents: 'none',
@@ -1818,7 +1816,7 @@ const ForkomposteringSection = (() => {
                       style={{
                         fontSize: 10.5,
                         fontStyle: 'italic',
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         pointerEvents: 'none',
                       }}
                     >
@@ -1865,7 +1863,7 @@ const ForkomposteringSection = (() => {
                 </div>
                 <h3
                   style={{
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontSize: 26,
                     lineHeight: 1.2,
                     margin: 0,
@@ -1938,7 +1936,7 @@ const ForkomposteringSection = (() => {
                   fontSize: 13.5,
                   textAlign: 'center',
                   fontStyle: 'italic',
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   paddingTop: 40,
                 }}
               >
@@ -2048,7 +2046,7 @@ const WedgeSection = (() => {
     return (
       <div
         style={{
-          fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+          fontFamily: '"IBM Plex Sans", sans-serif',
           background: palette.bg,
           color: palette.ink,
           minHeight: 'auto',
@@ -2071,14 +2069,13 @@ const WedgeSection = (() => {
             </div>
             <h1
               style={{
-                fontFamily: '"Fraunces", serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 fontSize: 'clamp(34px, 5.6vw, 64px)',
                 lineHeight: 1.02,
                 margin: '14px 0 0 0',
-                fontWeight: 400,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 maxWidth: 920,
-                fontVariationSettings: '"opsz" 144',
               }}
             >
               Marken jobber{' '}
@@ -2086,7 +2083,7 @@ const WedgeSection = (() => {
                 style={{
                   fontStyle: 'italic',
                   color: palette.petrol,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 i én retning
@@ -2094,8 +2091,8 @@ const WedgeSection = (() => {
             </h1>
             <p
               style={{
-                fontSize: 15.5,
-                lineHeight: 1.6,
+                fontSize: 16,
+                lineHeight: 1.7,
                 maxWidth: 680,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -2157,7 +2154,7 @@ const WedgeSection = (() => {
                   fill={palette.muted}
                   style={{
                     fontSize: 11,
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontStyle: 'italic',
                   }}
                 >
@@ -2317,7 +2314,7 @@ const WedgeSection = (() => {
                       textAnchor="middle"
                       fill={palette.ink}
                       style={{
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         fontSize: 18,
                         fontWeight: 500,
                         pointerEvents: 'none',
@@ -2333,7 +2330,7 @@ const WedgeSection = (() => {
                       style={{
                         fontSize: 11,
                         fontStyle: 'italic',
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         pointerEvents: 'none',
                       }}
                     >
@@ -2384,7 +2381,7 @@ const WedgeSection = (() => {
                 </div>
                 <h3
                   style={{
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontSize: 26,
                     lineHeight: 1.18,
                     margin: 0,
@@ -2452,7 +2449,7 @@ const WedgeSection = (() => {
                         lineHeight: 1.62,
                         margin: 0,
                         color: '#3A3631',
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         fontStyle: 'italic',
                       }}
                     >
@@ -2468,7 +2465,7 @@ const WedgeSection = (() => {
                   fontSize: 13.5,
                   textAlign: 'center',
                   fontStyle: 'italic',
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   paddingTop: 40,
                 }}
               >
@@ -2590,8 +2587,8 @@ const CFTSection = (() => {
     return (
       <div
         style={{
-          fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
-          background: palette.bg,
+          fontFamily: '"IBM Plex Sans", sans-serif',
+          background: '#FFFFFF',
           color: palette.ink,
           minHeight: 'auto',
           padding: '48px 28px 56px',
@@ -2613,14 +2610,13 @@ const CFTSection = (() => {
             </div>
             <h1
               style={{
-                fontFamily: '"Fraunces", serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 fontSize: 'clamp(34px, 5.6vw, 64px)',
                 lineHeight: 1.02,
                 margin: '14px 0 0 0',
-                fontWeight: 400,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 maxWidth: 940,
-                fontVariationSettings: '"opsz" 144',
               }}
             >
               Continuous flow through{' '}
@@ -2628,7 +2624,7 @@ const CFTSection = (() => {
                 style={{
                   fontStyle: 'italic',
                   color: palette.petrol,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 — gravitasjon gjør jobben
@@ -2636,8 +2632,8 @@ const CFTSection = (() => {
             </h1>
             <p
               style={{
-                fontSize: 15.5,
-                lineHeight: 1.6,
+                fontSize: 16,
+                lineHeight: 1.7,
                 maxWidth: 700,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -2861,7 +2857,7 @@ const CFTSection = (() => {
                 fill={palette.muted}
                 style={{
                   fontSize: 11,
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   fontStyle: 'italic',
                 }}
               >
@@ -2954,7 +2950,7 @@ const CFTSection = (() => {
                       textAnchor="middle"
                       fill={isActive ? palette.bg : palette.ink}
                       style={{
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         fontSize: 14,
                         fontWeight: 500,
                         pointerEvents: 'none',
@@ -2968,7 +2964,7 @@ const CFTSection = (() => {
                       y={midY - 6}
                       fill={palette.ink}
                       style={{
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         fontSize: 17,
                         fontWeight: 500,
                         pointerEvents: 'none',
@@ -2983,7 +2979,7 @@ const CFTSection = (() => {
                       style={{
                         fontSize: 11,
                         fontStyle: 'italic',
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         pointerEvents: 'none',
                       }}
                     >
@@ -3011,7 +3007,7 @@ const CFTSection = (() => {
                   fill={palette.muted}
                   style={{
                     fontSize: 11,
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontStyle: 'italic',
                   }}
                 >
@@ -3034,7 +3030,7 @@ const CFTSection = (() => {
                   fill={palette.muted}
                   style={{
                     fontSize: 11,
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontStyle: 'italic',
                   }}
                 >
@@ -3120,7 +3116,7 @@ const CFTSection = (() => {
                     style={{
                       fontSize: 11,
                       color: palette.muted,
-                      fontFamily: '"Fraunces", serif',
+                      fontFamily: '"IBM Plex Sans", sans-serif',
                       fontStyle: 'italic',
                     }}
                   >
@@ -3129,7 +3125,7 @@ const CFTSection = (() => {
                 </div>
                 <h3
                   style={{
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontSize: 26,
                     lineHeight: 1.18,
                     margin: 0,
@@ -3158,7 +3154,7 @@ const CFTSection = (() => {
                   fontSize: 13.5,
                   textAlign: 'center',
                   fontStyle: 'italic',
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   paddingTop: 40,
                 }}
               >
@@ -3294,7 +3290,7 @@ const ProduksjonSection = (() => {
     return (
       <div
         style={{
-          fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+          fontFamily: '"IBM Plex Sans", sans-serif',
           background: palette.bg,
           color: palette.ink,
           minHeight: 'auto',
@@ -3317,14 +3313,13 @@ const ProduksjonSection = (() => {
             </div>
             <h1
               style={{
-                fontFamily: '"Fraunces", serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 fontSize: 'clamp(34px, 5.6vw, 64px)',
                 lineHeight: 1.02,
                 margin: '14px 0 0 0',
-                fontWeight: 400,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 maxWidth: 920,
-                fontVariationSettings: '"opsz" 144',
               }}
             >
               Fra lokale råvarer{' '}
@@ -3332,7 +3327,7 @@ const ProduksjonSection = (() => {
                 style={{
                   fontStyle: 'italic',
                   color: palette.petrol,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 til levende jord
@@ -3340,8 +3335,8 @@ const ProduksjonSection = (() => {
             </h1>
             <p
               style={{
-                fontSize: 15.5,
-                lineHeight: 1.6,
+                fontSize: 16,
+                lineHeight: 1.7,
                 maxWidth: 680,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -3392,7 +3387,7 @@ const ProduksjonSection = (() => {
                       style={{
                         fontSize: 9.5,
                         fontStyle: 'italic',
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                       }}
                       transform={`rotate(-35, ${xStart}, ${yStart - 8})`}
                     >
@@ -3482,7 +3477,7 @@ const ProduksjonSection = (() => {
                       textAnchor="middle"
                       fill={isActive ? palette.bg : palette.ink}
                       style={{
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         fontSize: 17,
                         fontWeight: 500,
                         transition: 'fill 0.3s',
@@ -3596,7 +3591,7 @@ const ProduksjonSection = (() => {
                     style={{
                       fontSize: 11,
                       color: palette.muted,
-                      fontFamily: '"Fraunces", serif',
+                      fontFamily: '"IBM Plex Sans", sans-serif',
                       fontStyle: 'italic',
                     }}
                   >
@@ -3605,7 +3600,7 @@ const ProduksjonSection = (() => {
                 </div>
                 <h3
                   style={{
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontSize: 28,
                     lineHeight: 1.18,
                     margin: 0,
@@ -3658,7 +3653,7 @@ const ProduksjonSection = (() => {
                         lineHeight: 1.62,
                         margin: 0,
                         color: '#3A3631',
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         fontStyle: 'italic',
                       }}
                     >
@@ -3674,7 +3669,7 @@ const ProduksjonSection = (() => {
                   fontSize: 13.5,
                   textAlign: 'center',
                   fontStyle: 'italic',
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   paddingTop: 38,
                 }}
               >
@@ -3855,8 +3850,8 @@ const MarkAnatomiSection = (() => {
     return (
       <div
         style={{
-          fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
-          background: palette.bg,
+          fontFamily: '"IBM Plex Sans", sans-serif',
+          background: '#FFFFFF',
           color: palette.ink,
           minHeight: 'auto',
           padding: '48px 28px 56px',
@@ -3878,14 +3873,13 @@ const MarkAnatomiSection = (() => {
             </div>
             <h1
               style={{
-                fontFamily: '"Fraunces", serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 fontSize: 'clamp(34px, 5.6vw, 64px)',
                 lineHeight: 1.02,
                 margin: '14px 0 0 0',
-                fontWeight: 400,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 maxWidth: 940,
-                fontVariationSettings: '"opsz" 144',
               }}
             >
               En liten,{' '}
@@ -3893,7 +3887,7 @@ const MarkAnatomiSection = (() => {
                 style={{
                   fontStyle: 'italic',
                   color: palette.petrol,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 presis fabrikk
@@ -3901,8 +3895,8 @@ const MarkAnatomiSection = (() => {
             </h1>
             <p
               style={{
-                fontSize: 15.5,
-                lineHeight: 1.6,
+                fontSize: 16,
+                lineHeight: 1.7,
                 maxWidth: 700,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -4041,7 +4035,7 @@ const MarkAnatomiSection = (() => {
                       textAnchor="middle"
                       fill={isActive ? palette.bg : palette.ink}
                       style={{
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         fontSize: 13,
                         fontWeight: 500,
                         pointerEvents: 'none',
@@ -4079,7 +4073,7 @@ const MarkAnatomiSection = (() => {
                 style={{
                   fontSize: 11,
                   fontStyle: 'italic',
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   letterSpacing: '0.04em',
                 }}
               >
@@ -4123,7 +4117,7 @@ const MarkAnatomiSection = (() => {
                 </div>
                 <h3
                   style={{
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontSize: 26,
                     lineHeight: 1.18,
                     margin: 0,
@@ -4152,7 +4146,7 @@ const MarkAnatomiSection = (() => {
                   fontSize: 13.5,
                   textAlign: 'center',
                   fontStyle: 'italic',
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   paddingTop: 30,
                 }}
               >
@@ -4189,7 +4183,7 @@ const MarkAnatomiSection = (() => {
                 </div>
                 <div
                   style={{
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontSize: 19,
                     color: palette.bg,
                     fontWeight: 500,
@@ -4278,7 +4272,7 @@ const LabdataSection = (() => {
     return (
       <div
         style={{
-          fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+          fontFamily: '"IBM Plex Sans", sans-serif',
           background: palette.bg,
           color: palette.ink,
           minHeight: 'auto',
@@ -4301,14 +4295,13 @@ const LabdataSection = (() => {
             </div>
             <h1
               style={{
-                fontFamily: '"Fraunces", serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 fontSize: 'clamp(34px, 5.6vw, 64px)',
                 lineHeight: 1.02,
                 margin: '14px 0 0 0',
-                fontWeight: 400,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 maxWidth: 940,
-                fontVariationSettings: '"opsz" 144',
               }}
             >
               Tallene{' '}
@@ -4316,7 +4309,7 @@ const LabdataSection = (() => {
                 style={{
                   fontStyle: 'italic',
                   color: palette.petrol,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 bak posen
@@ -4324,8 +4317,8 @@ const LabdataSection = (() => {
             </h1>
             <p
               style={{
-                fontSize: 15.5,
-                lineHeight: 1.6,
+                fontSize: 16,
+                lineHeight: 1.7,
                 maxWidth: 700,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -4366,7 +4359,7 @@ const LabdataSection = (() => {
               </div>
               <div
                 style={{
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   fontSize: 36,
                   fontWeight: 400,
                   letterSpacing: '-0.01em',
@@ -4382,7 +4375,7 @@ const LabdataSection = (() => {
               <div style={{ fontSize: 10, letterSpacing: '0.22em', opacity: 0.65, fontWeight: 600 }}>RAPPORT</div>
               <div
                 style={{
-                  fontFamily: '"JetBrains Mono", monospace',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   fontSize: 15,
                   letterSpacing: '0.05em',
                   marginTop: 4,
@@ -4426,7 +4419,7 @@ const LabdataSection = (() => {
                       <span style={{ fontSize: 14, fontWeight: 500 }}>{n.label}</span>
                       <span
                         style={{
-                          fontFamily: '"Fraunces", serif',
+                          fontFamily: '"IBM Plex Sans", sans-serif',
                           fontSize: 26,
                           fontWeight: 500,
                           color: palette.petrol,
@@ -4456,7 +4449,7 @@ const LabdataSection = (() => {
                         }}
                       />
                     </div>
-                    <div style={{ fontSize: 11, color: palette.muted, marginTop: 8, fontStyle: 'italic', fontFamily: '"Fraunces", serif' }}>
+                    <div style={{ fontSize: 11, color: palette.muted, marginTop: 8, fontStyle: 'italic', fontFamily: '"IBM Plex Sans", sans-serif' }}>
                       {n.note}
                     </div>
                   </div>
@@ -4525,7 +4518,7 @@ const LabdataSection = (() => {
                     >
                       <span
                         style={{
-                          fontFamily: '"JetBrains Mono", monospace',
+                          fontFamily: '"IBM Plex Sans", sans-serif',
                           fontSize: 13,
                           fontWeight: 600,
                           color: isActive ? palette.petrol : palette.ink,
@@ -4552,7 +4545,7 @@ const LabdataSection = (() => {
                             fontSize: 10.5,
                             color: palette.muted,
                             marginTop: 4,
-                            fontFamily: '"JetBrains Mono", monospace',
+                            fontFamily: '"IBM Plex Sans", sans-serif',
                           }}
                         >
                           {m.displayValue || m.value.toString().replace('.', ',')} / {m.limit}
@@ -4564,7 +4557,7 @@ const LabdataSection = (() => {
                           color: palette.green,
                           textAlign: 'right',
                           fontWeight: 600,
-                          fontFamily: '"JetBrains Mono", monospace',
+                          fontFamily: '"IBM Plex Sans", sans-serif',
                         }}
                       >
                         {pct < 1 ? '<1' : Math.round(pct)}%
@@ -4599,7 +4592,7 @@ const LabdataSection = (() => {
                     <div style={{ fontSize: 12.5, fontWeight: 500, color: palette.muted }}>{o.label}</div>
                     <div
                       style={{
-                        fontFamily: '"Fraunces", serif',
+                        fontFamily: '"IBM Plex Sans", sans-serif',
                         fontSize: 22,
                         fontWeight: 500,
                         color: palette.ink,
@@ -4608,7 +4601,7 @@ const LabdataSection = (() => {
                     >
                       {o.value}
                     </div>
-                    <div style={{ fontSize: 11, color: palette.muted, marginTop: 4, fontStyle: 'italic', fontFamily: '"Fraunces", serif' }}>
+                    <div style={{ fontSize: 11, color: palette.muted, marginTop: 4, fontStyle: 'italic', fontFamily: '"IBM Plex Sans", sans-serif' }}>
                       {o.note}
                     </div>
                   </div>
@@ -4696,7 +4689,7 @@ const LabdataSection = (() => {
                   fontSize: 13.5,
                   textAlign: 'center',
                   fontStyle: 'italic',
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   paddingTop: 30,
                 }}
               >
@@ -4821,8 +4814,8 @@ const BruksguideSection = (() => {
     return (
       <div
         style={{
-          fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
-          background: palette.bg,
+          fontFamily: '"IBM Plex Sans", sans-serif',
+          background: '#FFFFFF',
           color: palette.ink,
           minHeight: 'auto',
           padding: '48px 28px 56px',
@@ -4844,14 +4837,13 @@ const BruksguideSection = (() => {
             </div>
             <h1
               style={{
-                fontFamily: '"Fraunces", serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 fontSize: 'clamp(34px, 5.6vw, 64px)',
                 lineHeight: 1.02,
                 margin: '14px 0 0 0',
-                fontWeight: 400,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 maxWidth: 940,
-                fontVariationSettings: '"opsz" 144',
               }}
             >
               Tre måter å bruke{' '}
@@ -4859,7 +4851,7 @@ const BruksguideSection = (() => {
                 style={{
                   fontStyle: 'italic',
                   color: palette.petrol,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 VermiCast
@@ -4867,8 +4859,8 @@ const BruksguideSection = (() => {
             </h1>
             <p
               style={{
-                fontSize: 15.5,
-                lineHeight: 1.6,
+                fontSize: 16,
+                lineHeight: 1.7,
                 maxWidth: 680,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -4916,7 +4908,7 @@ const BruksguideSection = (() => {
                   </div>
                   <div
                     style={{
-                      fontFamily: '"Fraunces", serif',
+                      fontFamily: '"IBM Plex Sans", sans-serif',
                       fontSize: 24,
                       fontWeight: 500,
                       marginTop: 6,
@@ -4928,7 +4920,7 @@ const BruksguideSection = (() => {
                     style={{
                       fontSize: 12.5,
                       fontStyle: 'italic',
-                      fontFamily: '"Fraunces", serif',
+                      fontFamily: '"IBM Plex Sans", sans-serif',
                       marginTop: 4,
                       opacity: isActive ? 0.9 : 0.7,
                     }}
@@ -4938,7 +4930,7 @@ const BruksguideSection = (() => {
                   <div
                     style={{
                       marginTop: 14,
-                      fontFamily: '"JetBrains Mono", monospace',
+                      fontFamily: '"IBM Plex Sans", sans-serif',
                       fontSize: 18,
                       fontWeight: 600,
                     }}
@@ -4974,7 +4966,7 @@ const BruksguideSection = (() => {
               </div>
               <h2
                 style={{
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   fontSize: 28,
                   lineHeight: 1.2,
                   margin: 0,
@@ -5018,7 +5010,7 @@ const BruksguideSection = (() => {
                     marginTop: 18,
                     fontSize: 12.5,
                     fontStyle: 'italic',
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     color: palette.muted,
                   }}
                 >
@@ -5061,7 +5053,7 @@ const BruksguideSection = (() => {
                       padding: '6px 12px',
                       fontSize: 12,
                       cursor: 'pointer',
-                      fontFamily: '"JetBrains Mono", monospace',
+                      fontFamily: '"IBM Plex Sans", sans-serif',
                       fontWeight: 500,
                       transition: 'all 0.2s',
                     }}
@@ -5104,7 +5096,7 @@ const BruksguideSection = (() => {
                     border: `1px solid ${palette.ink}`,
                     padding: '7px 10px',
                     fontSize: 16,
-                    fontFamily: '"JetBrains Mono", monospace',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     background: palette.bg,
                     color: palette.ink,
                     textAlign: 'center',
@@ -5141,7 +5133,7 @@ const BruksguideSection = (() => {
                 </div>
                 <div
                   style={{
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontSize: 42,
                     fontWeight: 500,
                     color: uc.color,
@@ -5158,7 +5150,7 @@ const BruksguideSection = (() => {
                     color: palette.muted,
                     marginTop: 6,
                     fontStyle: 'italic',
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                   }}
                 >
                   VermiCast
@@ -5178,7 +5170,7 @@ const BruksguideSection = (() => {
                   <span style={{ fontSize: 13, color: palette.muted }}>= cirka</span>
                   <span
                     style={{
-                      fontFamily: '"Fraunces", serif',
+                      fontFamily: '"IBM Plex Sans", sans-serif',
                       fontSize: 22,
                       fontWeight: 500,
                       color: palette.ink,
@@ -5331,7 +5323,7 @@ const SesongSection = (() => {
     return (
       <div
         style={{
-          fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+          fontFamily: '"IBM Plex Sans", sans-serif',
           background: palette.bg,
           color: palette.ink,
           minHeight: 'auto',
@@ -5354,14 +5346,13 @@ const SesongSection = (() => {
             </div>
             <h1
               style={{
-                fontFamily: '"Fraunces", serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 fontSize: 'clamp(34px, 5.6vw, 64px)',
                 lineHeight: 1.02,
                 margin: '14px 0 0 0',
-                fontWeight: 400,
+                fontWeight: 700,
                 letterSpacing: '-0.02em',
                 maxWidth: 920,
-                fontVariationSettings: '"opsz" 144',
               }}
             >
               Året rundt{' '}
@@ -5369,7 +5360,7 @@ const SesongSection = (() => {
                 style={{
                   fontStyle: 'italic',
                   color: palette.petrol,
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}
               >
                 med VermiCast
@@ -5377,8 +5368,8 @@ const SesongSection = (() => {
             </h1>
             <p
               style={{
-                fontSize: 15.5,
-                lineHeight: 1.6,
+                fontSize: 16,
+                lineHeight: 1.7,
                 maxWidth: 680,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -5479,7 +5470,7 @@ const SesongSection = (() => {
                             dominantBaseline="middle"
                             fill={isActive ? palette.bg : palette.ink}
                             style={{
-                              fontFamily: '"Fraunces", serif',
+                              fontFamily: '"IBM Plex Sans", sans-serif',
                               fontSize: 18,
                               fontWeight: 500,
                               pointerEvents: 'none',
@@ -5535,7 +5526,7 @@ const SesongSection = (() => {
                 textAnchor="middle"
                 fill={palette.bg}
                 style={{
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   fontSize: 26,
                   fontWeight: 500,
                   letterSpacing: '-0.01em',
@@ -5552,7 +5543,7 @@ const SesongSection = (() => {
                 style={{
                   fontSize: 10,
                   fontStyle: 'italic',
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                 }}
               >
                 {activeMonth ? activeMonth.fokus : 'velg en måned'}
@@ -5595,7 +5586,7 @@ const SesongSection = (() => {
                 </div>
                 <h3
                   style={{
-                    fontFamily: '"Fraunces", serif',
+                    fontFamily: '"IBM Plex Sans", sans-serif',
                     fontSize: 28,
                     lineHeight: 1.18,
                     margin: 0,
@@ -5659,7 +5650,7 @@ const SesongSection = (() => {
                   fontSize: 13.5,
                   textAlign: 'center',
                   fontStyle: 'italic',
-                  fontFamily: '"Fraunces", serif',
+                  fontFamily: '"IBM Plex Sans", sans-serif',
                   paddingTop: 40,
                 }}
               >
@@ -5694,7 +5685,7 @@ function VerminordDoc() {
   useEffect(() => {
     const link = document.createElement('link');
     link.href =
-      'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap';
+      'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap';
     link.rel = 'stylesheet';
     document.head.appendChild(link);
     return () => {
@@ -5749,7 +5740,7 @@ function VerminordDoc() {
   return (
     <div
       style={{
-        fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+        fontFamily: '"IBM Plex Sans", sans-serif',
         background: palette.bg,
         color: palette.ink,
         minHeight: '100vh',
@@ -5878,7 +5869,7 @@ function VerminordDoc() {
           <span
             style={{
               color: 'white',
-              fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+              fontFamily: '"IBM Plex Sans", sans-serif',
               fontSize: 18,
               fontWeight: 700,
               letterSpacing: '0.04em',
@@ -5906,7 +5897,7 @@ function VerminordDoc() {
                 textTransform: 'uppercase',
                 textDecoration: activeSection === s.id ? 'underline' : 'none',
                 textUnderlineOffset: 4,
-                fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+                fontFamily: '"IBM Plex Sans", sans-serif',
                 cursor: 'pointer',
                 transition: 'color 0.15s ease',
                 whiteSpace: 'nowrap',
@@ -5932,14 +5923,13 @@ function VerminordDoc() {
         <section id="section-intro" className="section-page" style={{ paddingTop: 64, paddingBottom: 64 }}>
           <h1
             style={{
-              fontFamily: '"Fraunces", serif',
+              fontFamily: '"IBM Plex Sans", sans-serif',
               fontSize: 'clamp(48px, 10vw, 72px)',
               lineHeight: 1.0,
               margin: 0,
-              fontWeight: 400,
-              letterSpacing: '-0.03em',
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
               color: palette.ink,
-              fontVariationSettings: '"opsz" 144',
             }}
           >
             Levende<br />
@@ -5948,8 +5938,9 @@ function VerminordDoc() {
 
           <p
             style={{
-              fontSize: 17,
-              lineHeight: 1.7,
+              fontSize: 18,
+              lineHeight: 1.75,
+              fontWeight: 300,
               color: palette.inkSoft,
               marginTop: 32,
               marginBottom: 0,
@@ -5961,6 +5952,13 @@ function VerminordDoc() {
           </p>
         </section>
 
+        {/* Section divider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '8px 0' }}>
+          <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
+          <div style={{ width: 6, height: 6, background: '#B8993A', transform: 'rotate(45deg)' }} />
+          <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
+        </div>
+
         {/* ============ PROCESS — "SLIK GJØR VI DET" ============ */}
         <section id="section-process" className="section-page" style={{ paddingTop: 56, paddingBottom: 64 }}>
           <SectionHeader number="01" label="Prosessen">
@@ -5969,9 +5967,10 @@ function VerminordDoc() {
 
           <p
             style={{
-              fontSize: 14,
+              fontSize: 16,
+              fontWeight: 300,
               color: palette.inkSoft,
-              lineHeight: 1.6,
+              lineHeight: 1.7,
               maxWidth: 520,
               marginTop: 0,
               marginBottom: 32,
@@ -5994,7 +5993,7 @@ function VerminordDoc() {
               letterSpacing: '0.16em',
               textTransform: 'uppercase',
               fontWeight: 600,
-              fontFamily: 'monospace',
+              fontFamily: '"IBM Plex Sans", sans-serif',
             }}
           >
             <span style={{ color: palette.warm }}>Dag 0</span>
@@ -6041,9 +6040,9 @@ function VerminordDoc() {
             </div>
             <div
               style={{
-                fontFamily: '"Fraunces", serif',
-                fontSize: 22,
-                fontWeight: 500,
+                fontFamily: '"IBM Plex Sans", sans-serif',
+                fontSize: 24,
+                fontWeight: 600,
                 letterSpacing: '-0.015em',
                 lineHeight: 1.3,
                 marginBottom: 12,
@@ -6065,7 +6064,13 @@ function VerminordDoc() {
           </div>
         </section>
 
-        
+        {/* Section divider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '8px 0' }}>
+          <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
+          <div style={{ width: 6, height: 6, background: '#B8993A', transform: 'rotate(45deg)' }} />
+          <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
+        </div>
+
         {/* ============ RAAVARER (integrated viz) ============ */}
         <section id="section-raavarer" className="section-page" style={{ padding: 0 }}>
           <RaavarerSection />
@@ -6096,6 +6101,13 @@ function VerminordDoc() {
           <MarkAnatomiSection />
         </section>
 
+        {/* Section divider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '8px 0' }}>
+          <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
+          <div style={{ width: 6, height: 6, background: '#B8993A', transform: 'rotate(45deg)' }} />
+          <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
+        </div>
+
         {/* ============ LAB-DASHBOARD (integrated viz) ============ */}
         <section id="section-lab-dashboard" className="section-page" style={{ padding: 0 }}>
           <LabdataSection />
@@ -6107,9 +6119,9 @@ function VerminordDoc() {
             Vi viser deg <em style={{ fontStyle: 'italic', color: palette.petrol }}>tallene</em>
           </SectionHeader>
 
-          <p style={{ fontSize: 15, lineHeight: 1.6, color: palette.inkSoft, marginTop: 0, marginBottom: 22, maxWidth: 480 }}>
+          <p style={{ fontSize: 16, fontWeight: 300, lineHeight: 1.7, color: palette.inkSoft, marginTop: 0, marginBottom: 22, maxWidth: 480 }}>
             Alle batcher analyseres av <strong style={{ fontWeight: 600 }}>ALS Laboratory Norway</strong> — et akkreditert norsk lab.
-            Rapport <span style={{ fontFamily: 'monospace', color: palette.inkSoft }}>{LAB.reportNumber}</span> · prøvedato {LAB.sampleDate}.
+            Rapport <span style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontWeight: 600, color: palette.inkSoft }}>{LAB.reportNumber}</span> · prøvedato {LAB.sampleDate}.
           </p>
 
           {/* Tabs */}
@@ -6129,14 +6141,14 @@ function VerminordDoc() {
                     flex: '1 1 auto',
                     background: 'transparent',
                     border: 'none',
-                    padding: '14px 10px',
+                    padding: '16px 12px',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: 7,
-                    fontSize: 12.5,
-                    fontWeight: isActive ? 600 : 500,
+                    gap: 8,
+                    fontSize: 14,
+                    fontWeight: isActive ? 600 : 400,
                     color: isActive ? palette.ink : palette.muted,
                     borderBottom: `2px solid ${isActive ? palette.petrol : 'transparent'}`,
                     transition: 'all 0.2s',
@@ -6198,10 +6210,10 @@ function VerminordDoc() {
                 <div style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: palette.moss, fontWeight: 600, marginBottom: 8 }}>
                   Reneste verdi
                 </div>
-                <div style={{ fontFamily: '"Fraunces", serif', fontSize: 20, fontWeight: 500, color: palette.ink, marginBottom: 6 }}>
+                <div style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 20, fontWeight: 500, color: palette.ink, marginBottom: 6 }}>
                   {cleanestMetal.name} ({cleanestMetal.symbol})
                 </div>
-                <div style={{ fontSize: 13.5, color: palette.inkSoft, fontFamily: '"Fraunces", serif', fontStyle: 'italic' }}>
+                <div style={{ fontSize: 13.5, color: palette.inkSoft, fontFamily: '"IBM Plex Sans", sans-serif', fontStyle: 'italic' }}>
                   Under {((cleanestMetal.measured / cleanestMetal.limit) * 100).toFixed(0)}% av Klasse I-grensen.
                 </div>
               </div>
@@ -6266,11 +6278,25 @@ function VerminordDoc() {
         </section>
 
         {/* ============ SESONG (integrated viz) ============ */}
+        {/* Section divider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '8px 0' }}>
+          <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
+          <div style={{ width: 6, height: 6, background: '#B8993A', transform: 'rotate(45deg)' }} />
+          <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
+        </div>
+
         <section id="section-sesong" className="section-page" style={{ padding: 0 }}>
           <SesongSection />
         </section>
 
         {/* ============ RINGVIRKNINGER ============ */}
+        {/* Section divider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '8px 0' }}>
+          <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
+          <div style={{ width: 6, height: 6, background: '#B8993A', transform: 'rotate(45deg)' }} />
+          <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
+        </div>
+
         <section id="section-ripples" className="section-page" style={{ paddingTop: 56, paddingBottom: 64 }}>
           <SectionHeader number="03" label="Ringvirkninger">
             Bevegelsene <em style={{ fontStyle: 'italic', color: palette.petrol }}>vi setter i gang</em>
@@ -6278,9 +6304,10 @@ function VerminordDoc() {
 
           <p
             style={{
-              fontSize: 14,
+              fontSize: 16,
+              fontWeight: 300,
               color: palette.inkSoft,
-              lineHeight: 1.6,
+              lineHeight: 1.7,
               maxWidth: 520,
               marginTop: 0,
               marginBottom: 16,
@@ -6293,13 +6320,14 @@ function VerminordDoc() {
 
           <p
             style={{
-              fontSize: 14,
+              fontSize: 16,
+              fontWeight: 300,
               color: palette.inkSoft,
-              lineHeight: 1.6,
+              lineHeight: 1.7,
               maxWidth: 520,
               marginTop: 0,
               marginBottom: 32,
-              fontFamily: '"Fraunces", serif',
+              fontFamily: '"IBM Plex Sans", sans-serif',
               fontStyle: 'italic',
             }}
           >
@@ -6348,9 +6376,9 @@ function VerminordDoc() {
             </div>
             <div
               style={{
-                fontFamily: '"Fraunces", serif',
-                fontSize: 22,
-                fontWeight: 500,
+                fontFamily: '"IBM Plex Sans", sans-serif',
+                fontSize: 24,
+                fontWeight: 600,
                 color: palette.ink,
                 lineHeight: 1.35,
                 letterSpacing: '-0.01em',
@@ -6384,10 +6412,10 @@ function VerminordDoc() {
             marginTop: 30,
           }}
         >
-          <div style={{ fontFamily: '"Fraunces", serif', fontSize: 32, fontWeight: 400, color: palette.ink, letterSpacing: '-0.02em', marginBottom: 4 }}>
+          <div style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 32, fontWeight: 400, color: palette.ink, letterSpacing: '-0.02em', marginBottom: 4 }}>
             Verminord
           </div>
-          <div style={{ fontFamily: '"Fraunces", serif', fontSize: 14, fontStyle: 'italic', color: palette.warm, marginBottom: 22 }}>
+          <div style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: 14, fontStyle: 'italic', color: palette.warm, marginBottom: 22 }}>
             laget av dyrkere, for dyrkere
           </div>
           <div style={{ fontSize: 11.5, color: palette.muted, lineHeight: 1.7, letterSpacing: '0.02em' }}>
