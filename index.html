@@ -5327,7 +5327,7 @@ const SesongSection = (() => {
 
           <div style={{ position: 'relative', marginTop: 8 }}>
             <svg
-              viewBox={`0 0 ${W} ${H}`}
+              viewBox="40 15 920 730"
               style={{ width: '100%', height: 'auto', display: 'block' }}
               xmlns="http://www.w3.org/2000/svg"
             >
@@ -5690,6 +5690,7 @@ function VerminordDoc() {
         color: palette.ink,
         minHeight: '100vh',
         position: 'relative',
+        overflowX: 'hidden',
       }}
     >
       {/* Print stylesheet */}
@@ -5760,6 +5761,13 @@ function VerminordDoc() {
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        .section-viz {
+          width: 100vw;
+          max-width: 960px;
+          position: relative;
+          margin-left: 50%;
+          transform: translateX(-50%);
         }
       `}</style>
 
@@ -6021,32 +6029,32 @@ function VerminordDoc() {
         </div>
 
         {/* ============ RAAVARER (integrated viz) ============ */}
-        <section id="section-raavarer" className="section-page" style={{ padding: 0 }}>
+        <section id="section-raavarer" className="section-page section-viz" style={{ padding: 0 }}>
           <RaavarerSection />
         </section>
 
         {/* ============ FORKOMPOSTERING (integrated viz) ============ */}
-        <section id="section-forkompostering" className="section-page" style={{ padding: 0 }}>
+        <section id="section-forkompostering" className="section-page section-viz" style={{ padding: 0 }}>
           <ForkomposteringSection />
         </section>
 
         {/* ============ WEDGE (integrated viz) ============ */}
-        <section id="section-wedge" className="section-page" style={{ padding: 0 }}>
+        <section id="section-wedge" className="section-page section-viz" style={{ padding: 0 }}>
           <WedgeSection />
         </section>
 
         {/* ============ CFT (integrated viz) ============ */}
-        <section id="section-cft" className="section-page" style={{ padding: 0 }}>
+        <section id="section-cft" className="section-page section-viz" style={{ padding: 0 }}>
           <CFTSection />
         </section>
 
         {/* ============ PRODUKSJON (integrated viz) ============ */}
-        <section id="section-produksjon" className="section-page" style={{ padding: 0 }}>
+        <section id="section-produksjon" className="section-page section-viz" style={{ padding: 0 }}>
           <ProduksjonSection />
         </section>
 
         {/* ============ EISENIA (integrated viz) ============ */}
-        <section id="section-eisenia" className="section-page" style={{ padding: 0 }}>
+        <section id="section-eisenia" className="section-page section-viz" style={{ padding: 0 }}>
           <MarkAnatomiSection />
         </section>
 
@@ -6058,7 +6066,7 @@ function VerminordDoc() {
         </div>
 
         {/* ============ LAB-DASHBOARD (integrated viz) ============ */}
-        <section id="section-lab-dashboard" className="section-page" style={{ padding: 0 }}>
+        <section id="section-lab-dashboard" className="section-page section-viz" style={{ padding: 0 }}>
           <LabdataSection />
         </section>
 
@@ -6222,7 +6230,7 @@ function VerminordDoc() {
 
         
         {/* ============ BRUK (integrated viz) ============ */}
-        <section id="section-bruk" className="section-page" style={{ padding: 0 }}>
+        <section id="section-bruk" className="section-page section-viz" style={{ padding: 0 }}>
           <BruksguideSection />
         </section>
 
@@ -6234,7 +6242,7 @@ function VerminordDoc() {
           <div style={{ flex: 1, height: 1, background: '#B8993A' }} />
         </div>
 
-        <section id="section-sesong" className="section-page" style={{ padding: 0 }}>
+        <section id="section-sesong" className="section-page section-viz" style={{ padding: 0 }}>
           <SesongSection />
         </section>
 
