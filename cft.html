@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verminord — CFT-systemet</title>
+<meta name="description" content="Continuous flow through: fôring ovenfra, høsting nedenfra." />
+<meta property="og:title" content="Verminord — CFT-systemet" />
+<meta property="og:description" content="Continuous flow through: fôring ovenfra, høsting nedenfra." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html, body, #root { margin: 0; padding: 0; }
+  body {
+    background: #F1EADC;
+    color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  #loader {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #F1EADC; color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    z-index: 9999;
+    transition: opacity 0.4s ease;
+  }
+  #loader.hidden { opacity: 0; pointer-events: none; }
+  .loader-text {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #A07A52;
+    font-weight: 600;
+  }
+  /* number inputs */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</head>
+<body>
+<div id="loader"><div class="loader-text">Laster Verminord…</div></div>
+<div id="root"></div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo } = React;
+
+const palette = {
+  bg: '#F1EADC',
+  paper: '#FAF5EA',
+  ink: '#1A1816',
+  petrol: '#1E4D6B',
+  petrolDark: '#143548',
+  warm: '#A07A52',
+  moss: '#5C6B3F',
+  muted: '#9B948A',
+  line: '#C9BFAE',
+  rust: '#B86B3E',
+  earth: '#5A4530',
+  earthLight: '#8A6B47',
+  earthMid: '#6F5238',
+  castings: '#2E2419',
+};
+
+const layers = [
+  {
+    id: 'foring',
+    label: 'Fôringssone',
+    sub: 'Topplag — fersk forkompost',
+    yRange: [0.0, 0.22],
+    color: palette.rust,
+    accent: '#C77B4D',
+    detail:
+      'Hver gang vi fôrer, legges et tynt lag fersk forkompost på toppen. Marken migrerer oppover for å nå det nye materialet — det er drivkraften som holder hele systemet i bevegelse.',
+    purpose: 'Toppfôring',
+  },
+  {
+    id: 'aktiv',
+    label: 'Aktivt sjikt',
+    sub: 'Høyest markaktivitet',
+    yRange: [0.22, 0.5],
+    color: palette.petrol,
+    accent: '#3D6E89',
+    detail:
+      'Her sitter mesteparten av populasjonen. Marken bryter ned forkomposten aktivt, blander biologien dypt inn i materialet, og produserer ferske støp som gradvis synker nedover i bedet.',
+    purpose: 'Bearbeiding',
+  },
+  {
+    id: 'modning',
+    label: 'Modningssjikt',
+    sub: 'Materialet stabiliserer seg',
+    yRange: [0.5, 0.78],
+    color: palette.warm,
+    accent: '#B58A5E',
+    detail:
+      'Materialet i denne sonen er ferdigbearbeidet. Aktiviteten avtar, marken trekker oppover mot ny mat, og castings stabiliserer seg til den karakteristiske mørke, krummede strukturen.',
+    purpose: 'Modning',
+  },
+  {
+    id: 'host',
+    label: 'Høstesjikt',
+    sub: 'Mesh + breaker bar',
+    yRange: [0.78, 0.95],
+    color: palette.moss,
+    accent: '#7A8556',
+    detail:
+      'Bunnen av bedet hviler på et finmasket netting. En breaker bar drar seg langsomt på tvers og skjærer av et tynt lag castings fra undersiden. Materialet faller ned i oppsamlingen og kan høstes uten å forstyrre marken over.',
+    purpose: 'Kontinuerlig høsting',
+  },
+];
+
+// pre-generated worm positions inside bed
+const cftWorms = Array.from({ length: 70 }, (_, i) => {
+  // density skewed toward upper-middle (active zone)
+  const y = 0.15 + Math.pow(Math.random(), 0.7) * 0.55;
+  return {
+    x: 0.05 + Math.random() * 0.9,
+    y,
+    size: 4 + Math.random() * 5,
+    delay: Math.random() * 4,
+    duration: 6 + Math.random() * 5,
+  };
+});
+
+// dropping particles for flow-through animation
+const dropParticles = Array.from({ length: 12 }, (_, i) => ({
+  x: 0.08 + Math.random() * 0.84,
+  delay: i * 0.5,
+  duration: 8 + Math.random() * 3,
+}));
+
+function VerminordCFT() {
+  const [active, setActive] = useState(null);
+  const [hovered, setHovered] = useState(null);
+
+  
+
+  const activeLayer = layers.find((l) => l.id === active);
+  const W = 1200;
+  const H = 760;
+  // Bed dimensions — vertical
+  const bedX = 320;
+  const bedY = 80;
+  const bedW = 360;
+  const bedH = 580;
+
+  return (
+    <div
+      style={{
+        fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+        background: palette.bg,
+        color: palette.ink,
+        minHeight: '100vh',
+        padding: '48px 28px 56px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div style={{ maxWidth: 1220, margin: '0 auto' }}>
+        <header style={{ marginBottom: 12 }}>
+          <div
+            style={{
+              fontSize: 10.5,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: palette.warm,
+              fontWeight: 600,
+            }}
+          >
+            Verminord — CFT-system
+          </div>
+          <h1
+            style={{
+              fontFamily: '"Fraunces", serif',
+              fontSize: 'clamp(34px, 5.6vw, 64px)',
+              lineHeight: 1.02,
+              margin: '14px 0 0 0',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              maxWidth: 940,
+              fontVariationSettings: '"opsz" 144',
+            }}
+          >
+            Continuous flow through{' '}
+            <em
+              style={{
+                fontStyle: 'italic',
+                color: palette.petrol,
+                fontWeight: 500,
+              }}
+            >
+              — gravitasjon gjør jobben
+            </em>
+          </h1>
+          <p
+            style={{
+              fontSize: 15.5,
+              lineHeight: 1.6,
+              maxWidth: 700,
+              margin: '22px 0 0 0',
+              color: '#3A3631',
+            }}
+          >
+            CFT-systemet (continuous flow through) er en vertikal seng der fersk forkompost legges på toppen, og
+            ferdige castings høstes fra bunnen via et finmasket netting og en breaker bar. Marken jobber i et
+            stabilt, kontinuerlig sjikt mellom de to. Trykk på et lag for å se hvordan det fungerer.
+          </p>
+        </header>
+
+        <div style={{ position: 'relative', marginTop: 8 }}>
+          <svg
+            viewBox={`0 0 ${W} ${H}`}
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <filter id="grain-cft">
+                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+                <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.03 0" />
+              </filter>
+              {/* vertical material gradient — fresh top to mature bottom */}
+              <linearGradient id="cftMaterial" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="#A87047" />
+                <stop offset="22%" stopColor={palette.earthMid} />
+                <stop offset="50%" stopColor={palette.earth} />
+                <stop offset="78%" stopColor="#3F311F" />
+                <stop offset="100%" stopColor={palette.castings} />
+              </linearGradient>
+              <pattern id="mesh" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+                <path d="M 0 0 L 10 0 M 0 0 L 0 10" stroke={palette.muted} strokeWidth="0.6" />
+              </pattern>
+              <marker id="arrowCFT" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill={palette.warm} />
+              </marker>
+            </defs>
+
+            {/* Frame: vertical bed walls */}
+            {/* Left wall */}
+            <rect x={bedX - 16} y={bedY - 10} width="16" height={bedH + 30} fill={palette.ink} opacity="0.9" />
+            {/* Right wall */}
+            <rect x={bedX + bedW} y={bedY - 10} width="16" height={bedH + 30} fill={palette.ink} opacity="0.9" />
+            {/* Top rim */}
+            <rect x={bedX - 16} y={bedY - 10} width={bedW + 32} height="6" fill={palette.ink} opacity="0.9" />
+
+            {/* Material inside bed */}
+            <rect x={bedX} y={bedY} width={bedW} height={bedH} fill="url(#cftMaterial)" />
+
+            {/* Subtle horizontal texture lines suggesting layering */}
+            {Array.from({ length: 28 }, (_, i) => (
+              <line
+                key={`tex-${i}`}
+                x1={bedX}
+                y1={bedY + (i / 28) * bedH + Math.sin(i * 1.3) * 1}
+                x2={bedX + bedW}
+                y2={bedY + (i / 28) * bedH + Math.sin(i * 1.3 + 0.3) * 1}
+                stroke={palette.bg}
+                strokeWidth="0.3"
+                opacity="0.25"
+              />
+            ))}
+
+            {/* Top fresh feed layer indicator */}
+            <rect
+              x={bedX + 6}
+              y={bedY + 4}
+              width={bedW - 12}
+              height={10}
+              fill={palette.rust}
+              opacity="0.55"
+              rx="1"
+            />
+
+            {/* Dropping particles — subtle flow-through visualization */}
+            {dropParticles.map((p, i) => (
+              <circle
+                key={`drop-${i}`}
+                cx={bedX + p.x * bedW}
+                cy={bedY + 20}
+                r="1.5"
+                fill={palette.bg}
+                opacity="0"
+              >
+                <animate
+                  attributeName="cy"
+                  from={bedY + 20}
+                  to={bedY + bedH - 20}
+                  dur={`${p.duration}s`}
+                  begin={`${p.delay}s`}
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0; 0.55; 0.55; 0"
+                  keyTimes="0; 0.15; 0.85; 1"
+                  dur={`${p.duration}s`}
+                  begin={`${p.delay}s`}
+                  repeatCount="indefinite"
+                />
+              </circle>
+            ))}
+
+            {/* Worms — density in upper middle */}
+            {cftWorms.map((w, i) => {
+              const wx = bedX + w.x * bedW;
+              const wy = bedY + w.y * bedH;
+              return (
+                <g
+                  key={`cftworm-${i}`}
+                  style={{
+                    opacity: 0,
+                    animation: `wormInC 1s ${0.4 + i * 0.015}s ease-out forwards`,
+                  }}
+                >
+                  <path
+                    d={`M ${wx - w.size / 2} ${wy} q ${w.size / 4} ${-w.size / 3} ${w.size / 2} 0 t ${w.size / 2} 0`}
+                    fill="none"
+                    stroke="#1F1610"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    opacity="0.85"
+                  >
+                    <animateTransform
+                      attributeName="transform"
+                      type="translate"
+                      values="0 0; -3 -2; 0 0; 3 1; 0 0"
+                      dur={`${w.duration}s`}
+                      begin={`${w.delay}s`}
+                      repeatCount="indefinite"
+                    />
+                  </path>
+                </g>
+              );
+            })}
+
+            {/* Mesh floor */}
+            <rect x={bedX} y={bedY + bedH - 12} width={bedW} height="12" fill="url(#mesh)" opacity="0.7" />
+            <line
+              x1={bedX}
+              y1={bedY + bedH - 12}
+              x2={bedX + bedW}
+              y2={bedY + bedH - 12}
+              stroke={palette.muted}
+              strokeWidth="1.2"
+            />
+            <line
+              x1={bedX}
+              y1={bedY + bedH}
+              x2={bedX + bedW}
+              y2={bedY + bedH}
+              stroke={palette.muted}
+              strokeWidth="1.2"
+            />
+
+            {/* Breaker bar under mesh */}
+            <g>
+              <rect
+                x={bedX + 30}
+                y={bedY + bedH + 8}
+                width={bedW - 60}
+                height="10"
+                fill={palette.petrol}
+                rx="2"
+              >
+                <animate
+                  attributeName="x"
+                  values={`${bedX + 30}; ${bedX + 50}; ${bedX + 30}`}
+                  dur="8s"
+                  repeatCount="indefinite"
+                />
+              </rect>
+              {/* support brackets */}
+              <circle cx={bedX + 40} cy={bedY + bedH + 13} r="3" fill={palette.ink} />
+              <circle cx={bedX + bedW - 40} cy={bedY + bedH + 13} r="3" fill={palette.ink} />
+            </g>
+
+            {/* Falling castings from bottom */}
+            {[0, 1, 2, 3, 4].map((i) => (
+              <circle
+                key={`fall-${i}`}
+                cx={bedX + 60 + i * ((bedW - 120) / 5)}
+                cy={bedY + bedH + 25}
+                r="2"
+                fill={palette.castings}
+                opacity="0"
+              >
+                <animate
+                  attributeName="cy"
+                  from={bedY + bedH + 25}
+                  to={bedY + bedH + 90}
+                  dur="3s"
+                  begin={`${i * 0.6}s`}
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0; 0.9; 0"
+                  keyTimes="0; 0.4; 1"
+                  dur="3s"
+                  begin={`${i * 0.6}s`}
+                  repeatCount="indefinite"
+                />
+              </circle>
+            ))}
+
+            {/* Collection pile at bottom */}
+            <path
+              d={`M ${bedX + 20} ${bedY + bedH + 100}
+                  Q ${bedX + bedW / 2} ${bedY + bedH + 70}
+                    ${bedX + bedW - 20} ${bedY + bedH + 100}
+                  L ${bedX + bedW - 20} ${bedY + bedH + 115}
+                  L ${bedX + 20} ${bedY + bedH + 115} Z`}
+              fill={palette.castings}
+              opacity="0.85"
+            />
+            <text
+              x={bedX + bedW / 2}
+              y={bedY + bedH + 138}
+              textAnchor="middle"
+              fill={palette.muted}
+              style={{
+                fontSize: 11,
+                fontFamily: '"Fraunces", serif',
+                fontStyle: 'italic',
+              }}
+            >
+              ferdige castings · oppsamling
+            </text>
+
+            {/* Top arrow showing feed input */}
+            <g style={{ opacity: 0, animation: 'fadeInCFT 1s 0.5s ease-out forwards' }}>
+              <text
+                x={bedX + bedW / 2}
+                y={bedY - 28}
+                textAnchor="middle"
+                fill={palette.rust}
+                style={{ fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600 }}
+              >
+                Fôring inn
+              </text>
+              <line
+                x1={bedX + bedW / 2}
+                y1={bedY - 22}
+                x2={bedX + bedW / 2}
+                y2={bedY - 6}
+                stroke={palette.warm}
+                strokeWidth="1.2"
+                markerEnd="url(#arrowCFT)"
+              />
+            </g>
+
+            {/* Right-side zone labels with leader lines */}
+            {layers.map((l, i) => {
+              const midY = bedY + ((l.yRange[0] + l.yRange[1]) / 2) * bedH;
+              const labelX = bedX + bedW + 70;
+              const isActive = active === l.id;
+              const isHover = hovered === l.id;
+              return (
+                <g
+                  key={l.id}
+                  onClick={() => setActive(isActive ? null : l.id)}
+                  onMouseEnter={() => setHovered(l.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    cursor: 'pointer',
+                    opacity: 0,
+                    animation: `fadeInCFT 0.7s ${0.6 + i * 0.1}s ease-out forwards`,
+                  }}
+                >
+                  {/* Highlight overlay on bed */}
+                  <rect
+                    x={bedX}
+                    y={bedY + l.yRange[0] * bedH}
+                    width={bedW}
+                    height={(l.yRange[1] - l.yRange[0]) * bedH}
+                    fill={l.accent}
+                    opacity={isActive ? 0.22 : isHover ? 0.1 : 0}
+                    style={{ transition: 'opacity 0.3s' }}
+                  />
+                  <rect
+                    x={bedX}
+                    y={bedY + l.yRange[0] * bedH}
+                    width={bedW}
+                    height={(l.yRange[1] - l.yRange[0]) * bedH}
+                    fill="none"
+                    stroke={l.color}
+                    strokeWidth={isActive ? 2 : 0}
+                    style={{ transition: 'stroke-width 0.3s' }}
+                  />
+
+                  {/* leader line */}
+                  <line
+                    x1={bedX + bedW + 6}
+                    y1={midY}
+                    x2={labelX - 10}
+                    y2={midY}
+                    stroke={isActive ? l.color : palette.line}
+                    strokeWidth={isActive ? 1.4 : 1}
+                  />
+                  {/* numbered tag */}
+                  <circle
+                    cx={labelX}
+                    cy={midY}
+                    r="18"
+                    fill={isActive ? l.color : palette.paper}
+                    stroke={isActive ? l.color : palette.ink}
+                    strokeWidth="1"
+                    style={{ transition: 'all 0.3s' }}
+                  />
+                  <text
+                    x={labelX}
+                    y={midY + 4}
+                    textAnchor="middle"
+                    fill={isActive ? palette.bg : palette.ink}
+                    style={{
+                      fontFamily: '"Fraunces", serif',
+                      fontSize: 14,
+                      fontWeight: 500,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    0{i + 1}
+                  </text>
+                  {/* Label text */}
+                  <text
+                    x={labelX + 30}
+                    y={midY - 6}
+                    fill={palette.ink}
+                    style={{
+                      fontFamily: '"Fraunces", serif',
+                      fontSize: 17,
+                      fontWeight: 500,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {l.label}
+                  </text>
+                  <text
+                    x={labelX + 30}
+                    y={midY + 12}
+                    fill={l.color}
+                    style={{
+                      fontSize: 11,
+                      fontStyle: 'italic',
+                      fontFamily: '"Fraunces", serif',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {l.sub}
+                  </text>
+                </g>
+              );
+            })}
+
+            {/* Left side big concept labels */}
+            <g style={{ opacity: 0, animation: 'fadeInCFT 1s 1s ease-out forwards' }}>
+              <text
+                x={bedX - 50}
+                y={bedY + 30}
+                textAnchor="end"
+                fill={palette.rust}
+                style={{ fontSize: 10.5, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
+              >
+                Topp
+              </text>
+              <text
+                x={bedX - 50}
+                y={bedY + 50}
+                textAnchor="end"
+                fill={palette.muted}
+                style={{
+                  fontSize: 11,
+                  fontFamily: '"Fraunces", serif',
+                  fontStyle: 'italic',
+                }}
+              >
+                fersk inn
+              </text>
+
+              <text
+                x={bedX - 50}
+                y={bedY + bedH - 30}
+                textAnchor="end"
+                fill={palette.moss}
+                style={{ fontSize: 10.5, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
+              >
+                Bunn
+              </text>
+              <text
+                x={bedX - 50}
+                y={bedY + bedH - 10}
+                textAnchor="end"
+                fill={palette.muted}
+                style={{
+                  fontSize: 11,
+                  fontFamily: '"Fraunces", serif',
+                  fontStyle: 'italic',
+                }}
+              >
+                ferdig ut
+              </text>
+
+              {/* vertical arrow */}
+              <line
+                x1={bedX - 30}
+                y1={bedY + 70}
+                x2={bedX - 30}
+                y2={bedY + bedH - 50}
+                stroke={palette.warm}
+                strokeWidth="1"
+                strokeDasharray="3 3"
+                markerEnd="url(#arrowCFT)"
+              />
+              <text
+                x={bedX - 30}
+                y={bedY + bedH / 2}
+                textAnchor="middle"
+                fill={palette.warm}
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  fontWeight: 600,
+                }}
+                transform={`rotate(-90, ${bedX - 30}, ${bedY + bedH / 2})`}
+              >
+                Gravitasjon
+              </text>
+            </g>
+
+            <rect width={W} height={H} filter="url(#grain-cft)" opacity="0.6" pointerEvents="none" />
+          </svg>
+
+          <style>{`
+            @keyframes fadeInCFT {
+              from { opacity: 0; transform: translateY(6px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes wormInC {
+              from { opacity: 0; transform: scale(0.6); }
+              to { opacity: 0.85; transform: scale(1); }
+            }
+          `}</style>
+        </div>
+
+        <div
+          style={{
+            marginTop: 8,
+            background: activeLayer ? palette.paper : 'transparent',
+            border: activeLayer ? `1px solid ${palette.line}` : '1px dashed transparent',
+            padding: '28px 30px',
+            minHeight: 170,
+            transition: 'background 0.3s ease, border-color 0.3s ease',
+          }}
+        >
+          {activeLayer ? (
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 14,
+                  marginBottom: 10,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.24em',
+                    textTransform: 'uppercase',
+                    color: activeLayer.color,
+                    fontWeight: 700,
+                  }}
+                >
+                  {activeLayer.label}
+                </span>
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: palette.muted,
+                    fontFamily: '"Fraunces", serif',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  funksjon: {activeLayer.purpose}
+                </span>
+              </div>
+              <h3
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontSize: 26,
+                  lineHeight: 1.18,
+                  margin: 0,
+                  fontWeight: 500,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                <em style={{ fontStyle: 'italic', color: activeLayer.color }}>{activeLayer.sub}</em>
+              </h3>
+              <p
+                style={{
+                  fontSize: 15,
+                  lineHeight: 1.65,
+                  margin: '18px 0 0 0',
+                  color: '#3A3631',
+                  maxWidth: 800,
+                }}
+              >
+                {activeLayer.detail}
+              </p>
+            </div>
+          ) : (
+            <div
+              style={{
+                color: palette.muted,
+                fontSize: 13.5,
+                textAlign: 'center',
+                fontStyle: 'italic',
+                fontFamily: '"Fraunces", serif',
+                paddingTop: 40,
+              }}
+            >
+              Trykk på et lag for å se hva som skjer i hvert sjikt.
+            </div>
+          )}
+        </div>
+
+        <footer
+          style={{
+            marginTop: 56,
+            paddingTop: 22,
+            borderTop: `1px solid ${palette.line}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            fontSize: 12,
+            color: palette.muted,
+            gap: 16,
+            letterSpacing: '0.02em',
+          }}
+        >
+          <span>Verminord AS · CFT — vertikal kontinuerlig vermikompostering</span>
+          <span
+            style={{
+              fontStyle: 'italic',
+              fontFamily: '"Fraunces", serif',
+              color: '#5A5650',
+            }}
+          >
+            laget av dyrkere, for dyrkere
+          </span>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<VerminordCFT />);
+
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) {
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 500);
+  }
+}, 200);
+</script>
+</body>
+</html>

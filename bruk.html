@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verminord — Bruksguide</title>
+<meta name="description" content="Tre måter å bruke VermiCast — med dosekalkulator." />
+<meta property="og:title" content="Verminord — Bruksguide" />
+<meta property="og:description" content="Tre måter å bruke VermiCast — med dosekalkulator." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html, body, #root { margin: 0; padding: 0; }
+  body {
+    background: #F1EADC;
+    color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  #loader {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #F1EADC; color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    z-index: 9999;
+    transition: opacity 0.4s ease;
+  }
+  #loader.hidden { opacity: 0; pointer-events: none; }
+  .loader-text {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #A07A52;
+    font-weight: 600;
+  }
+  /* number inputs */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</head>
+<body>
+<div id="loader"><div class="loader-text">Laster Verminord…</div></div>
+<div id="root"></div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo } = React;
+
+const palette = {
+  bg: '#F1EADC',
+  paper: '#FAF5EA',
+  ink: '#1A1816',
+  petrol: '#1E4D6B',
+  petrolDark: '#143548',
+  warm: '#A07A52',
+  moss: '#5C6B3F',
+  muted: '#9B948A',
+  line: '#C9BFAE',
+  rust: '#B86B3E',
+  green: '#4A6B3F',
+};
+
+const useCases = {
+  jord: {
+    id: 'jord',
+    label: 'Jordforbedring',
+    sub: 'Bland inn i jord eller plantemiks',
+    color: palette.moss,
+    desc: 'Den vanligste bruken. VermiCast blandes inn i jord, plantemiks eller pottejord for å tilføre biologi, struktur og næring. Ingen brenning — bland direkte med røttene.',
+    ratio: '10–30 %',
+    ratioLabel: 'av total volum',
+    inputLabel: 'Liter jord eller plantemiks',
+    inputUnit: 'L',
+    presets: [10, 20, 40, 80, 200],
+    defaultInput: 40,
+    step: 1,
+    calculate: (input) => ({ min: input * 0.1, max: input * 0.3 }),
+    tips: [
+      'Nyplanting: bland inn i nedre del av plantehullet',
+      'Eksisterende pott: graft inn i de øvre 5–10 cm',
+      'Nytt høybed: rør inn i hele jordlaget',
+    ],
+    timing: 'Når som helst — biologien aktiveres så snart materialet er fuktig',
+  },
+  topp: {
+    id: 'topp',
+    label: 'Toppdressing',
+    sub: 'Et tynt lag på jordoverflaten',
+    color: palette.warm,
+    desc: 'Et tynt lag VermiCast på jorda rundt etablerte planter. Vannet drar biologi og næring nedover til røttene, samtidig som det dekker og beskytter overflaten.',
+    ratio: '1–2 cm',
+    ratioLabel: 'tykt lag',
+    inputLabel: 'Område som skal toppdresses',
+    inputUnit: 'm²',
+    presets: [0.5, 1, 2, 5, 10],
+    defaultInput: 2,
+    step: 0.5,
+    calculate: (input) => ({ min: input * 10, max: input * 20 }),
+    tips: [
+      'Tilfør ved sesongstart og igjen midtsesong for tunge fôrere',
+      'Vann godt etter påføring — flytter biologi ned i jorda',
+      'Spesielt godt rundt tomat, chili, kål og fruktbusker',
+    ],
+    timing: 'Hver 6–8 uke i vekstsesongen',
+  },
+  te: {
+    id: 'te',
+    label: 'Kompost-te',
+    sub: 'Aktivt luftet vermikompost-te (AACT)',
+    color: palette.petrol,
+    desc: 'Brygg en biologisk aktiv te ved å lufte VermiCast i vann i 18–36 timer. Brukes både til vanning og bladsprøyting. Levende biologi som koloniserer planten og jorda direkte.',
+    ratio: '1:10',
+    ratioLabel: 'VermiCast til vann',
+    inputLabel: 'Hvor mye te vil du brygge',
+    inputUnit: 'L',
+    presets: [5, 10, 20, 40, 100],
+    defaultInput: 10,
+    step: 1,
+    calculate: (input) => ({ min: input * 0.05, max: input * 0.1 }),
+    tips: [
+      'Bruk klorfritt vann — klor dreper biologien',
+      'Luft konstant under brygging med akvarie-pumpe',
+      'Bruk innen 4 timer etter brygging er ferdig',
+    ],
+    timing: 'Hver 2–3 uke i vekstsesongen for optimal effekt',
+  },
+};
+
+function fmt(n) {
+  if (n >= 10) return n.toFixed(0);
+  if (n >= 1) return n.toFixed(1).replace('.', ',');
+  return n.toFixed(2).replace('.', ',');
+}
+
+function VerminordBruksguide() {
+  const [active, setActive] = useState('jord');
+  const [inputValue, setInputValue] = useState(useCases['jord'].defaultInput);
+
+  
+
+  const setUseCase = (id) => {
+    setActive(id);
+    setInputValue(useCases[id].defaultInput);
+  };
+
+  const uc = useCases[active];
+  const { min, max } = uc.calculate(inputValue);
+  const bagsMin = min / 5;
+  const bagsMax = max / 5;
+
+  return (
+    <div
+      style={{
+        fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+        background: palette.bg,
+        color: palette.ink,
+        minHeight: '100vh',
+        padding: '48px 28px 56px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div style={{ maxWidth: 1180, margin: '0 auto' }}>
+        <header style={{ marginBottom: 32 }}>
+          <div
+            style={{
+              fontSize: 10.5,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: palette.warm,
+              fontWeight: 600,
+            }}
+          >
+            Verminord — Bruksguide
+          </div>
+          <h1
+            style={{
+              fontFamily: '"Fraunces", serif',
+              fontSize: 'clamp(34px, 5.6vw, 64px)',
+              lineHeight: 1.02,
+              margin: '14px 0 0 0',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              maxWidth: 940,
+              fontVariationSettings: '"opsz" 144',
+            }}
+          >
+            Tre måter å bruke{' '}
+            <em
+              style={{
+                fontStyle: 'italic',
+                color: palette.petrol,
+                fontWeight: 500,
+              }}
+            >
+              VermiCast
+            </em>
+          </h1>
+          <p
+            style={{
+              fontSize: 15.5,
+              lineHeight: 1.6,
+              maxWidth: 680,
+              margin: '22px 0 0 0',
+              color: '#3A3631',
+            }}
+          >
+            Velg bruksmåte og oppgi hvor mye du jobber med — så regner kalkulatoren ut hvor mye VermiCast du
+            trenger, og hvor mange 5-liters poser det tilsvarer.
+          </p>
+        </header>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: 14,
+            marginBottom: 28,
+          }}
+        >
+          {Object.values(useCases).map((u) => {
+            const isActive = active === u.id;
+            return (
+              <div
+                key={u.id}
+                onClick={() => setUseCase(u.id)}
+                style={{
+                  background: isActive ? u.color : palette.paper,
+                  color: isActive ? palette.bg : palette.ink,
+                  border: `1px solid ${isActive ? u.color : palette.line}`,
+                  padding: '22px 22px',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s ease',
+                  transform: isActive ? 'translateY(-2px)' : 'none',
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    fontWeight: 700,
+                    opacity: isActive ? 0.75 : 0.55,
+                  }}
+                >
+                  Bruksmåte
+                </div>
+                <div
+                  style={{
+                    fontFamily: '"Fraunces", serif',
+                    fontSize: 24,
+                    fontWeight: 500,
+                    marginTop: 6,
+                  }}
+                >
+                  {u.label}
+                </div>
+                <div
+                  style={{
+                    fontSize: 12.5,
+                    fontStyle: 'italic',
+                    fontFamily: '"Fraunces", serif',
+                    marginTop: 4,
+                    opacity: isActive ? 0.9 : 0.7,
+                  }}
+                >
+                  {u.sub}
+                </div>
+                <div
+                  style={{
+                    marginTop: 14,
+                    fontFamily: '"JetBrains Mono", monospace',
+                    fontSize: 18,
+                    fontWeight: 600,
+                  }}
+                >
+                  {u.ratio}
+                </div>
+                <div style={{ fontSize: 10.5, opacity: isActive ? 0.8 : 0.6, marginTop: 2 }}>{u.ratioLabel}</div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 28,
+            marginBottom: 28,
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: 10,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: uc.color,
+                fontWeight: 700,
+                marginBottom: 10,
+              }}
+            >
+              {uc.label}
+            </div>
+            <h2
+              style={{
+                fontFamily: '"Fraunces", serif',
+                fontSize: 28,
+                lineHeight: 1.2,
+                margin: 0,
+                fontWeight: 500,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              <em style={{ fontStyle: 'italic', color: uc.color }}>{uc.sub}</em>
+            </h2>
+            <p
+              style={{
+                fontSize: 15,
+                lineHeight: 1.62,
+                margin: '16px 0 0 0',
+                color: '#3A3631',
+              }}
+            >
+              {uc.desc}
+            </p>
+
+            <div style={{ marginTop: 24, paddingTop: 18, borderTop: `1px solid ${palette.line}` }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: palette.warm,
+                  fontWeight: 600,
+                  marginBottom: 10,
+                }}
+              >
+                Tips
+              </div>
+              <ul style={{ margin: 0, paddingLeft: 18, fontSize: 14, lineHeight: 1.6, color: '#3A3631' }}>
+                {uc.tips.map((t, i) => (
+                  <li key={i} style={{ marginBottom: 6 }}>{t}</li>
+                ))}
+              </ul>
+              <div
+                style={{
+                  marginTop: 18,
+                  fontSize: 12.5,
+                  fontStyle: 'italic',
+                  fontFamily: '"Fraunces", serif',
+                  color: palette.muted,
+                }}
+              >
+                Timing: {uc.timing}
+              </div>
+            </div>
+          </div>
+
+          <div
+            style={{
+              background: palette.paper,
+              border: `1px solid ${palette.line}`,
+              padding: '26px 28px',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 10,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: palette.petrol,
+                fontWeight: 700,
+                marginBottom: 14,
+              }}
+            >
+              Dosekalkulator
+            </div>
+
+            <label style={{ fontSize: 13, color: palette.muted, fontWeight: 500 }}>{uc.inputLabel}</label>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+              {uc.presets.map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setInputValue(p)}
+                  style={{
+                    border: `1px solid ${inputValue === p ? uc.color : palette.line}`,
+                    background: inputValue === p ? uc.color : 'transparent',
+                    color: inputValue === p ? palette.bg : palette.ink,
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                    fontFamily: '"JetBrains Mono", monospace',
+                    fontWeight: 500,
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {fmt(p)} {uc.inputUnit}
+                </button>
+              ))}
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                marginTop: 14,
+                paddingTop: 14,
+                borderTop: `1px dashed ${palette.line}`,
+              }}
+            >
+              <button
+                onClick={() => setInputValue(Math.max(uc.step, inputValue - uc.step))}
+                style={{
+                  border: `1px solid ${palette.ink}`,
+                  background: 'transparent',
+                  width: 32,
+                  height: 32,
+                  cursor: 'pointer',
+                  fontSize: 18,
+                  fontWeight: 600,
+                }}
+              >
+                −
+              </button>
+              <input
+                type="number"
+                value={inputValue}
+                onChange={(e) => setInputValue(Math.max(0, parseFloat(e.target.value) || 0))}
+                style={{
+                  width: 90,
+                  border: `1px solid ${palette.ink}`,
+                  padding: '7px 10px',
+                  fontSize: 16,
+                  fontFamily: '"JetBrains Mono", monospace',
+                  background: palette.bg,
+                  color: palette.ink,
+                  textAlign: 'center',
+                }}
+              />
+              <span style={{ fontSize: 14, color: palette.muted }}>{uc.inputUnit}</span>
+              <button
+                onClick={() => setInputValue(inputValue + uc.step)}
+                style={{
+                  border: `1px solid ${palette.ink}`,
+                  background: 'transparent',
+                  width: 32,
+                  height: 32,
+                  cursor: 'pointer',
+                  fontSize: 18,
+                  fontWeight: 600,
+                }}
+              >
+                +
+              </button>
+            </div>
+
+            <div style={{ marginTop: 24, paddingTop: 20, borderTop: `1px solid ${palette.line}` }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: palette.muted,
+                  fontWeight: 600,
+                }}
+              >
+                Du trenger
+              </div>
+              <div
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontSize: 42,
+                  fontWeight: 500,
+                  color: uc.color,
+                  marginTop: 6,
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1,
+                }}
+              >
+                {fmt(min)}–{fmt(max)} L
+              </div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: palette.muted,
+                  marginTop: 6,
+                  fontStyle: 'italic',
+                  fontFamily: '"Fraunces", serif',
+                }}
+              >
+                VermiCast
+              </div>
+
+              <div
+                style={{
+                  marginTop: 22,
+                  paddingTop: 16,
+                  borderTop: `1px dashed ${palette.line}`,
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 12,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span style={{ fontSize: 13, color: palette.muted }}>= cirka</span>
+                <span
+                  style={{
+                    fontFamily: '"Fraunces", serif',
+                    fontSize: 22,
+                    fontWeight: 500,
+                    color: palette.ink,
+                  }}
+                >
+                  {bagsMin < 0.5 ? 'mindre enn ½ pose' : `${fmt(bagsMin)}–${fmt(bagsMax)} poser`}
+                </span>
+                <span style={{ fontSize: 12, color: palette.muted }}>à 5 L</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer
+          style={{
+            marginTop: 32,
+            paddingTop: 22,
+            borderTop: `1px solid ${palette.line}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            fontSize: 12,
+            color: palette.muted,
+            gap: 16,
+            letterSpacing: '0.02em',
+          }}
+        >
+          <span>Verminord AS · 5 L pustende poser · 389 kr</span>
+          <span
+            style={{
+              fontStyle: 'italic',
+              fontFamily: '"Fraunces", serif',
+              color: '#5A5650',
+            }}
+          >
+            laget av dyrkere, for dyrkere
+          </span>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<VerminordBruksguide />);
+
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) {
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 500);
+  }
+}, 200);
+</script>
+</body>
+</html>

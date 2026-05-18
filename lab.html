@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verminord — Laboratoriedata</title>
+<meta name="description" content="Klasse I-sertifisert vermikompost — ALS Norway-analyse." />
+<meta property="og:title" content="Verminord — Laboratoriedata" />
+<meta property="og:description" content="Klasse I-sertifisert vermikompost — ALS Norway-analyse." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html, body, #root { margin: 0; padding: 0; }
+  body {
+    background: #F1EADC;
+    color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  #loader {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #F1EADC; color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    z-index: 9999;
+    transition: opacity 0.4s ease;
+  }
+  #loader.hidden { opacity: 0; pointer-events: none; }
+  .loader-text {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #A07A52;
+    font-weight: 600;
+  }
+  /* number inputs */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</head>
+<body>
+<div id="loader"><div class="loader-text">Laster Verminord…</div></div>
+<div id="root"></div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo } = React;
+
+const palette = {
+  bg: '#F1EADC',
+  paper: '#FAF5EA',
+  ink: '#1A1816',
+  petrol: '#1E4D6B',
+  petrolDark: '#143548',
+  warm: '#A07A52',
+  moss: '#5C6B3F',
+  muted: '#9B948A',
+  line: '#C9BFAE',
+  rust: '#B86B3E',
+  green: '#4A6B3F',
+};
+
+const npk = [
+  { id: 'N', label: 'Nitrogen (N)', value: 1.16, unit: '%', note: 'Organisk, langsomt tilgjengelig', detail: 'Organisk bundet nitrogen som frigjøres langsomt etter hvert som mikrobiologien i jorda bryter det ned. Ingen risiko for brenning, ingen utvasking — planten får jevn tilgang gjennom hele sesongen.' },
+  { id: 'P', label: 'Fosfor (P)', value: 0.46, unit: '%', note: 'Totalfosfor', detail: 'Totalfosfor som over tid blir biologisk tilgjengelig gjennom mikrobiell aktivitet og mykorrhiza-nettverk. Spesielt verdifullt for rotutvikling, blomstring og fruktsetting.' },
+  { id: 'K', label: 'Kalium (K)', value: 0.51, unit: '%', note: 'Kalium', detail: 'Kalium støtter celleregulering, stresstoleranse og smaks- og kvalitetsutvikling i frukt og grønnsaker. Stabilt nivå uten saltbelastning på jorda.' },
+];
+
+const metals = [
+  { id: 'Cd', label: 'Kadmium', sym: 'Cd', value: 0.32, limit: 0.8, detail: 'Langt under grenseverdi (40 % av Klasse I-grense). Kadmium tas opp av planter — å holde det lavt er kritisk for matsikkerhet.' },
+  { id: 'Pb', label: 'Bly', sym: 'Pb', value: 9.4, limit: 60, detail: 'Kun 16 % av grenseverdi. Bly er bioakkumulerende og en av de viktigste parameterne i organisk gjødselvare.' },
+  { id: 'Hg', label: 'Kvikksølv', sym: 'Hg', value: 0.2, limit: 0.9, displayValue: '< 0,20', detail: 'Under deteksjonsgrense (<0,20 mg/kg). Ingen påvist forurensning fra industrielle eller landbruksrelaterte kilder.' },
+  { id: 'Cr', label: 'Krom', sym: 'Cr', value: 4.62, limit: 100, detail: 'Kun 4,6 % av grenseverdi. Naturlig forekommende på lave nivåer i organisk materiale.' },
+  { id: 'Ni', label: 'Nikkel', sym: 'Ni', value: 4.6, limit: 50, detail: 'Kun 9 % av grenseverdi. Spormineral som forekommer naturlig i jord og kompost.' },
+  { id: 'Cu', label: 'Kobber', sym: 'Cu', value: 32.2, limit: 150, detail: 'Cirka 21 % av grenseverdi. Kobber er essensielt mikronæringsstoff på lave nivåer — for høyt blir det giftig for jordbiologien.' },
+  { id: 'Zn', label: 'Sink', sym: 'Zn', value: 139, limit: 400, detail: 'Cirka 35 % av grenseverdi. Naturlig høyere i organisk materiale fra dyregjødsel — fortsatt godt innenfor Klasse I.' },
+  { id: 'As', label: 'Arsen', sym: 'As', value: 2.14, limit: 25, detail: 'Kun 8,6 % av grenseverdi. Lave, naturlige nivåer fra lokale råvarer.' },
+];
+
+const other = [
+  { id: 'om', label: 'Organisk materiale', value: '43,6 %', note: 'Glødetap — høy biologisk aktivitet', detail: 'Andelen organisk materiale viser hvor mye karbon og biomasse produktet inneholder. 43,6 % er svært høyt sammenlignet med vanlig kompost og indikerer et levende, biologisk rikt produkt.' },
+  { id: 'cn', label: 'C:N-forhold', value: '22:1', note: 'Godt modnet', detail: 'Karbon-til-nitrogen-forholdet forteller om materialet er ferdig modnet. Et forhold under 25:1 betyr stabilt materiale som ikke konkurrerer med planter om nitrogen.' },
+  { id: 'ts', label: 'Tørrstoff', value: '42,4 %', note: 'Stabil og håndterbar', detail: 'Fuktigheten er optimal for håndtering — fuktig nok til at biologien lever, tørr nok til at produktet er drøyt og lett å bruke.' },
+  { id: 'ca', label: 'Kalsium (Ca)', value: '2,46 %', note: 'Naturlig pH-buffer', detail: 'Høyt kalsiuminnhold gir en naturlig pH-buffer som beskytter mot sure forhold og støtter celleveggstruktur hos plantene.' },
+  { id: 's', label: 'Svovel (S)', value: '4 090 mg/kg', note: 'Viktig for brassica og løk', detail: 'Svovel er en undervurdert næring — kritisk for brassica-familien (kål, brokkoli) og løkvekster, og bidrar til smaksutvikling og enzymsystemer.' },
+];
+
+const safety = [
+  { id: 'sal', label: 'Salmonella', value: 'ikke påvist', color: palette.green },
+  { id: 'col', label: 'Termotolerante koliforme', value: '< 20 MPN/g', color: palette.green },
+  { id: 'kl', label: 'Klassifisering', value: 'Klasse I', color: palette.petrol },
+];
+
+function VerminordLabdata() {
+  const [active, setActive] = useState(null);
+
+  
+
+  const activeItem =
+    [...npk, ...metals, ...other].find((i) => i.id === active) || null;
+
+  const cardStyle = (id) => ({
+    background: palette.paper,
+    border: `1px solid ${active === id ? palette.petrol : palette.line}`,
+    padding: '16px 18px',
+    cursor: 'pointer',
+    transition: 'all 0.25s ease',
+    transform: active === id ? 'translateY(-2px)' : 'none',
+  });
+
+  return (
+    <div
+      style={{
+        fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+        background: palette.bg,
+        color: palette.ink,
+        minHeight: '100vh',
+        padding: '48px 28px 56px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div style={{ maxWidth: 1220, margin: '0 auto' }}>
+        <header style={{ marginBottom: 32 }}>
+          <div
+            style={{
+              fontSize: 10.5,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: palette.warm,
+              fontWeight: 600,
+            }}
+          >
+            Verminord — Laboratorieresultater
+          </div>
+          <h1
+            style={{
+              fontFamily: '"Fraunces", serif',
+              fontSize: 'clamp(34px, 5.6vw, 64px)',
+              lineHeight: 1.02,
+              margin: '14px 0 0 0',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              maxWidth: 940,
+              fontVariationSettings: '"opsz" 144',
+            }}
+          >
+            Tallene{' '}
+            <em
+              style={{
+                fontStyle: 'italic',
+                color: palette.petrol,
+                fontWeight: 500,
+              }}
+            >
+              bak posen
+            </em>
+          </h1>
+          <p
+            style={{
+              fontSize: 15.5,
+              lineHeight: 1.6,
+              maxWidth: 700,
+              margin: '22px 0 0 0',
+              color: '#3A3631',
+            }}
+          >
+            Hver batch analyseres av ALS Laboratory Norway — et akkreditert laboratorium. Verdiene under bekrefter
+            at VermiCast oppfyller kravene til Klasse I etter norsk gjødselvareforskrift. Trykk på en parameter
+            for å se hva den betyr i praksis.
+          </p>
+        </header>
+
+        {/* Klasse I hero */}
+        <div
+          style={{
+            background: palette.petrol,
+            color: palette.bg,
+            padding: '28px 32px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 18,
+            marginBottom: 32,
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: 10,
+                letterSpacing: '0.24em',
+                textTransform: 'uppercase',
+                opacity: 0.7,
+                fontWeight: 600,
+                marginBottom: 6,
+              }}
+            >
+              Sertifisering
+            </div>
+            <div
+              style={{
+                fontFamily: '"Fraunces", serif',
+                fontSize: 36,
+                fontWeight: 400,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Klasse I — <em style={{ fontStyle: 'italic' }}>høyeste standard</em>
+            </div>
+            <div style={{ fontSize: 13, marginTop: 8, opacity: 0.85 }}>
+              Norsk gjødselvareforskrift · Egnet til økologisk dyrking
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 10, letterSpacing: '0.22em', opacity: 0.65, fontWeight: 600 }}>RAPPORT</div>
+            <div
+              style={{
+                fontFamily: '"JetBrains Mono", monospace',
+                fontSize: 15,
+                letterSpacing: '0.05em',
+                marginTop: 4,
+              }}
+            >
+              ALS NO2604972
+            </div>
+          </div>
+        </div>
+
+        {/* Three column grid */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+            gap: 28,
+          }}
+        >
+          {/* NPK column */}
+          <section>
+            <div
+              style={{
+                fontSize: 10.5,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: palette.warm,
+                fontWeight: 600,
+                marginBottom: 14,
+              }}
+            >
+              NPK · % av tørrvekt
+            </div>
+            <div style={{ display: 'grid', gap: 10 }}>
+              {npk.map((n) => (
+                <div
+                  key={n.id}
+                  onClick={() => setActive(active === n.id ? null : n.id)}
+                  style={cardStyle(n.id)}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <span style={{ fontSize: 14, fontWeight: 500 }}>{n.label}</span>
+                    <span
+                      style={{
+                        fontFamily: '"Fraunces", serif',
+                        fontSize: 26,
+                        fontWeight: 500,
+                        color: palette.petrol,
+                      }}
+                    >
+                      {n.value.toString().replace('.', ',')} {n.unit}
+                    </span>
+                  </div>
+                  {/* bar */}
+                  <div
+                    style={{
+                      height: 4,
+                      background: palette.line,
+                      marginTop: 10,
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: 0,
+                        top: 0,
+                        height: '100%',
+                        width: `${Math.min(n.value * 60, 100)}%`,
+                        background: palette.petrol,
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: 11, color: palette.muted, marginTop: 8, fontStyle: 'italic', fontFamily: '"Fraunces", serif' }}>
+                    {n.note}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Heavy metals */}
+          <section>
+            <div
+              style={{
+                fontSize: 10.5,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: palette.warm,
+                fontWeight: 600,
+                marginBottom: 14,
+              }}
+            >
+              Tungmetaller · mg/kg TS
+            </div>
+            <div
+              style={{
+                background: palette.paper,
+                border: `1px solid ${palette.line}`,
+                padding: '14px 16px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '60px 1fr 60px',
+                  gap: 10,
+                  fontSize: 10,
+                  letterSpacing: '0.16em',
+                  color: palette.muted,
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  paddingBottom: 8,
+                  borderBottom: `1px solid ${palette.line}`,
+                  marginBottom: 10,
+                }}
+              >
+                <span>Param</span>
+                <span>Målt / Grense</span>
+                <span style={{ textAlign: 'right' }}>% av</span>
+              </div>
+              {metals.map((m) => {
+                const pct = (m.value / m.limit) * 100;
+                const isActive = active === m.id;
+                return (
+                  <div
+                    key={m.id}
+                    onClick={() => setActive(isActive ? null : m.id)}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '60px 1fr 60px',
+                      gap: 10,
+                      alignItems: 'center',
+                      padding: '8px 0',
+                      cursor: 'pointer',
+                      borderRadius: 2,
+                      background: isActive ? 'rgba(30,77,107,0.06)' : 'transparent',
+                      transition: 'background 0.2s',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: '"JetBrains Mono", monospace',
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: isActive ? palette.petrol : palette.ink,
+                      }}
+                    >
+                      {m.sym}
+                    </span>
+                    <div>
+                      <div style={{ height: 6, background: palette.line, position: 'relative' }}>
+                        <div
+                          style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 0,
+                            height: '100%',
+                            width: `${Math.max(pct, 2)}%`,
+                            background: isActive ? palette.petrol : palette.green,
+                            transition: 'background 0.25s',
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 10.5,
+                          color: palette.muted,
+                          marginTop: 4,
+                          fontFamily: '"JetBrains Mono", monospace',
+                        }}
+                      >
+                        {m.displayValue || m.value.toString().replace('.', ',')} / {m.limit}
+                      </div>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: palette.green,
+                        textAlign: 'right',
+                        fontWeight: 600,
+                        fontFamily: '"JetBrains Mono", monospace',
+                      }}
+                    >
+                      {pct < 1 ? '<1' : Math.round(pct)}%
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Other values */}
+          <section>
+            <div
+              style={{
+                fontSize: 10.5,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: palette.warm,
+                fontWeight: 600,
+                marginBottom: 14,
+              }}
+            >
+              Øvrige nøkkelverdier
+            </div>
+            <div style={{ display: 'grid', gap: 10 }}>
+              {other.map((o) => (
+                <div
+                  key={o.id}
+                  onClick={() => setActive(active === o.id ? null : o.id)}
+                  style={cardStyle(o.id)}
+                >
+                  <div style={{ fontSize: 12.5, fontWeight: 500, color: palette.muted }}>{o.label}</div>
+                  <div
+                    style={{
+                      fontFamily: '"Fraunces", serif',
+                      fontSize: 22,
+                      fontWeight: 500,
+                      color: palette.ink,
+                      marginTop: 2,
+                    }}
+                  >
+                    {o.value}
+                  </div>
+                  <div style={{ fontSize: 11, color: palette.muted, marginTop: 4, fontStyle: 'italic', fontFamily: '"Fraunces", serif' }}>
+                    {o.note}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        {/* Safety / Hygiene strip */}
+        <div
+          style={{
+            marginTop: 32,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: 14,
+          }}
+        >
+          {safety.map((s) => (
+            <div
+              key={s.id}
+              style={{
+                background: palette.paper,
+                border: `1px solid ${palette.line}`,
+                borderLeft: `4px solid ${s.color}`,
+                padding: '14px 18px',
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: s.color,
+                  fontWeight: 700,
+                }}
+              >
+                ✓ {s.label}
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 500, marginTop: 4 }}>{s.value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Detail panel */}
+        <div
+          style={{
+            marginTop: 24,
+            background: activeItem ? palette.paper : 'transparent',
+            border: activeItem ? `1px solid ${palette.line}` : '1px dashed transparent',
+            padding: '24px 28px',
+            minHeight: 110,
+            transition: 'all 0.3s ease',
+          }}
+        >
+          {activeItem ? (
+            <div>
+              <div
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.24em',
+                  textTransform: 'uppercase',
+                  color: palette.warm,
+                  fontWeight: 600,
+                  marginBottom: 6,
+                }}
+              >
+                {activeItem.label || activeItem.id}
+              </div>
+              <p
+                style={{
+                  fontSize: 15,
+                  lineHeight: 1.6,
+                  margin: 0,
+                  color: '#3A3631',
+                  maxWidth: 820,
+                }}
+              >
+                {activeItem.detail}
+              </p>
+            </div>
+          ) : (
+            <div
+              style={{
+                color: palette.muted,
+                fontSize: 13.5,
+                textAlign: 'center',
+                fontStyle: 'italic',
+                fontFamily: '"Fraunces", serif',
+                paddingTop: 30,
+              }}
+            >
+              Trykk på en parameter for å se hva den betyr.
+            </div>
+          )}
+        </div>
+
+        <footer
+          style={{
+            marginTop: 48,
+            paddingTop: 22,
+            borderTop: `1px solid ${palette.line}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            fontSize: 12,
+            color: palette.muted,
+            gap: 16,
+            letterSpacing: '0.02em',
+          }}
+        >
+          <span>Verminord AS · Analysert av ALS Laboratory Norway</span>
+          <span
+            style={{
+              fontStyle: 'italic',
+              fontFamily: '"Fraunces", serif',
+              color: '#5A5650',
+            }}
+          >
+            laget av dyrkere, for dyrkere
+          </span>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<VerminordLabdata />);
+
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) {
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 500);
+  }
+}, 200);
+</script>
+</body>
+</html>

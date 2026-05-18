@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verminord — Forkompostering</title>
+<meta name="description" content="Seks trinn fra ren råvare til klart fôr for marken." />
+<meta property="og:title" content="Verminord — Forkompostering" />
+<meta property="og:description" content="Seks trinn fra ren råvare til klart fôr for marken." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html, body, #root { margin: 0; padding: 0; }
+  body {
+    background: #F1EADC;
+    color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  #loader {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #F1EADC; color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    z-index: 9999;
+    transition: opacity 0.4s ease;
+  }
+  #loader.hidden { opacity: 0; pointer-events: none; }
+  .loader-text {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #A07A52;
+    font-weight: 600;
+  }
+  /* number inputs */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</head>
+<body>
+<div id="loader"><div class="loader-text">Laster Verminord…</div></div>
+<div id="root"></div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo } = React;
+
+const palette = {
+  bg: '#F1EADC',
+  paper: '#FAF5EA',
+  ink: '#1A1816',
+  petrol: '#1E4D6B',
+  petrolDark: '#143548',
+  warm: '#A07A52',
+  moss: '#5C6B3F',
+  muted: '#9B948A',
+  line: '#C9BFAE',
+  rust: '#B86B3E',
+};
+
+const steps = [
+  {
+    id: 'mottak',
+    n: '01',
+    label: 'Mottak',
+    sub: 'Råvarer inn',
+    hva: 'Vi tar imot rene, godkjente råvarer — llama-møkk, brukt soppsubstrat, løvmold, papp, sagflis — og inspiserer for synlig forurensning.',
+    kontroll: 'Ingen plast, metall, glass eller kjemisk forurensning. Kun internt godkjente innsatsmaterialer.',
+    avvik: 'Materialer som ikke kan brukes, settes til side eller kasseres samme dag.',
+  },
+  {
+    id: 'blanding',
+    n: '02',
+    label: 'Blanding',
+    sub: 'Karbon + nitrogen + struktur',
+    hva: 'Råvarene blandes etter gjeldende intern oppskrift. Karbon-, nitrogen- og strukturmaterialer kombineres til en jevn batch.',
+    kontroll: 'Blandingen skal være jevn, luftig og uten kompakte lommer.',
+    avvik: 'Ved kompaktering eller dårlig luft: tilfør mer strukturmateriale og bland på nytt.',
+  },
+  {
+    id: 'fukt',
+    n: '03',
+    label: 'Fukt',
+    sub: 'Som en oppvridd svamp',
+    hva: 'Fuktigheten justeres til riktig nivå. Målet er en batch som er fuktig, men ikke dryppende — biologien trenger vann, men ikke metning.',
+    kontroll: 'Klem en håndfull: skal holde sammen, men ikke avgi vann.',
+    avvik: 'For våt: tilfør tørt karbon. For tørr: tilfør vann og bland på nytt.',
+  },
+  {
+    id: 'merking',
+    n: '04',
+    label: 'Merking',
+    sub: 'Batch-ID + dato',
+    hva: 'Batchen plasseres i forkomposttank eller område, og merkes tydelig med Batch-ID, dato og råvaretype.',
+    kontroll: 'All informasjon skal være lesbar og registrert i loggen samme dag.',
+    avvik: 'Manglende merking rettes umiddelbart — sporbarhet er fundamentet.',
+  },
+  {
+    id: 'aktiv',
+    n: '05',
+    label: 'Aktiv fase',
+    sub: 'Varme, lukt og struktur',
+    hva: 'Batchen får utvikle varme og starte nedbrytning. Vi følger temperatur, lukt og struktur jevnlig gjennom den aktive fasen.',
+    kontroll: 'Batchen skal utvikle varme uten råtten eller anaerob lukt. Jordaktig duft = sunn prosess.',
+    avvik: 'Ved sur eller råtten lukt: bland inn tørt materiale og luft opp batchen.',
+  },
+  {
+    id: 'modning',
+    n: '06',
+    label: 'Modning',
+    sub: 'Stabilt og jordaktig',
+    hva: 'Når den aktive fasen avtar, lar vi batchen modne. Den må være stabil og trygg før den brukes som fôr til marken.',
+    kontroll: 'Temperaturen skal falle ned. Materialet skal være stabilt, jordaktig og luktnøytralt.',
+    avvik: 'Aldri bruk varm eller ustabil batch direkte til marken — det stresser biologien.',
+  },
+];
+
+function nodePos(i, total, w, y) {
+  const margin = 90;
+  const step = (w - margin * 2) / (total - 1);
+  return [margin + i * step, y];
+}
+
+function VerminordForkompostering() {
+  const [active, setActive] = useState(null);
+  const [hovered, setHovered] = useState(null);
+
+  
+
+  const activeStep = steps.find((s) => s.id === active);
+  const W = 1100;
+  const H = 380;
+  const Y = 200;
+
+  return (
+    <div
+      style={{
+        fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+        background: palette.bg,
+        color: palette.ink,
+        minHeight: '100vh',
+        padding: '48px 28px 56px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div style={{ maxWidth: 1180, margin: '0 auto' }}>
+        <header style={{ marginBottom: 12 }}>
+          <div
+            style={{
+              fontSize: 10.5,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: palette.warm,
+              fontWeight: 600,
+            }}
+          >
+            Verminord — Forkompostering
+          </div>
+          <h1
+            style={{
+              fontFamily: '"Fraunces", serif',
+              fontSize: 'clamp(34px, 5.6vw, 64px)',
+              lineHeight: 1.02,
+              margin: '14px 0 0 0',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              maxWidth: 920,
+              fontVariationSettings: '"opsz" 144',
+            }}
+          >
+            Seks steg{' '}
+            <em
+              style={{
+                fontStyle: 'italic',
+                color: palette.petrol,
+                fontWeight: 500,
+              }}
+            >
+              før marken får sin mat
+            </em>
+          </h1>
+          <p
+            style={{
+              fontSize: 15.5,
+              lineHeight: 1.6,
+              maxWidth: 660,
+              margin: '22px 0 0 0',
+              color: '#3A3631',
+            }}
+          >
+            Forkompostering er fundamentet. Vi blander, fukter, varmer og modner råvarene i en kontrollert prosess
+            før noe som helst slippes inn i markrommet. Trykk på et steg for å se hva som skjer — og hva vi
+            korrigerer hvis noe avviker.
+          </p>
+        </header>
+
+        <div style={{ position: 'relative', marginTop: 8 }}>
+          <svg
+            viewBox={`0 0 ${W} ${H}`}
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <filter id="grain-fk">
+                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+                <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.03 0" />
+              </filter>
+              <linearGradient id="heatGrad" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor={palette.warm} stopOpacity="0.15" />
+                <stop offset="50%" stopColor={palette.rust} stopOpacity="0.35" />
+                <stop offset="100%" stopColor={palette.moss} stopOpacity="0.2" />
+              </linearGradient>
+            </defs>
+
+            {/* connecting path */}
+            <path
+              d={`M ${nodePos(0, steps.length, W, Y)[0]} ${Y} Q ${W / 2} ${Y - 60} ${
+                nodePos(steps.length - 1, steps.length, W, Y)[0]
+              } ${Y}`}
+              fill="none"
+              stroke={palette.line}
+              strokeWidth="1.4"
+              strokeDasharray="2 6"
+            />
+
+            {/* heat / process indicator bar */}
+            <rect
+              x={nodePos(0, steps.length, W, Y)[0]}
+              y={Y + 80}
+              width={
+                nodePos(steps.length - 1, steps.length, W, Y)[0] -
+                nodePos(0, steps.length, W, Y)[0]
+              }
+              height="6"
+              fill="url(#heatGrad)"
+              rx="3"
+            />
+            <text
+              x={nodePos(0, steps.length, W, Y)[0]}
+              y={Y + 108}
+              fill={palette.muted}
+              style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
+            >
+              kald · rå
+            </text>
+            <text
+              x={W / 2}
+              y={Y + 108}
+              textAnchor="middle"
+              fill={palette.rust}
+              style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
+            >
+              termofil · aktiv
+            </text>
+            <text
+              x={nodePos(steps.length - 1, steps.length, W, Y)[0]}
+              y={Y + 108}
+              textAnchor="end"
+              fill={palette.moss}
+              style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
+            >
+              moden · stabil
+            </text>
+
+            {/* nodes */}
+            {steps.map((s, i) => {
+              const [x, y] = nodePos(i, steps.length, W, Y);
+              const yNode = Y - Math.sin((i / (steps.length - 1)) * Math.PI) * 50;
+              const isActive = active === s.id;
+              const isHover = hovered === s.id;
+              const r = isActive || isHover ? 36 : 32;
+              return (
+                <g
+                  key={s.id}
+                  onClick={() => setActive(isActive ? null : s.id)}
+                  onMouseEnter={() => setHovered(s.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    cursor: 'pointer',
+                    opacity: 0,
+                    animation: `nodeIn 0.7s ${0.15 + i * 0.08}s ease-out forwards`,
+                  }}
+                >
+                  <circle cx={x} cy={yNode} r="50" fill="transparent" />
+                  <circle
+                    cx={x}
+                    cy={yNode}
+                    r={r + 6}
+                    fill="none"
+                    stroke={palette.petrol}
+                    strokeWidth="1"
+                    opacity={isHover && !isActive ? 0.4 : 0}
+                    style={{ transition: 'opacity 0.25s' }}
+                  />
+                  <circle
+                    cx={x}
+                    cy={yNode}
+                    r={r}
+                    fill={isActive ? palette.petrol : palette.paper}
+                    stroke={isActive ? palette.petrol : palette.ink}
+                    strokeWidth={isActive ? 0 : 1.2}
+                    style={{ transition: 'all 0.3s ease' }}
+                  />
+                  <text
+                    x={x}
+                    y={yNode + 4}
+                    textAnchor="middle"
+                    fill={isActive ? palette.bg : palette.ink}
+                    style={{
+                      fontFamily: '"Fraunces", serif',
+                      fontSize: 16,
+                      fontWeight: 500,
+                      pointerEvents: 'none',
+                      transition: 'fill 0.3s',
+                    }}
+                  >
+                    {s.n}
+                  </text>
+                  <text
+                    x={x}
+                    y={yNode + 60}
+                    textAnchor="middle"
+                    fill={palette.ink}
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      pointerEvents: 'none',
+                      letterSpacing: '0.01em',
+                    }}
+                  >
+                    {s.label}
+                  </text>
+                  <text
+                    x={x}
+                    y={yNode + 76}
+                    textAnchor="middle"
+                    fill={palette.muted}
+                    style={{
+                      fontSize: 10.5,
+                      fontStyle: 'italic',
+                      fontFamily: '"Fraunces", serif',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {s.sub}
+                  </text>
+                </g>
+              );
+            })}
+
+            <rect width={W} height={H} filter="url(#grain-fk)" opacity="0.6" pointerEvents="none" />
+          </svg>
+
+          <style>{`
+            @keyframes nodeIn {
+              from { opacity: 0; transform: scale(0.85); }
+              to { opacity: 1; transform: scale(1); }
+            }
+          `}</style>
+        </div>
+
+        <div
+          style={{
+            marginTop: 8,
+            background: activeStep ? palette.paper : 'transparent',
+            border: activeStep ? `1px solid ${palette.line}` : '1px dashed transparent',
+            padding: '28px 30px',
+            minHeight: 180,
+            transition: 'background 0.3s ease, border-color 0.3s ease',
+          }}
+        >
+          {activeStep ? (
+            <div>
+              <div
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.24em',
+                  textTransform: 'uppercase',
+                  color: palette.warm,
+                  marginBottom: 8,
+                  fontWeight: 600,
+                }}
+              >
+                Steg {activeStep.n} · {activeStep.label}
+              </div>
+              <h3
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontSize: 26,
+                  lineHeight: 1.2,
+                  margin: 0,
+                  fontWeight: 500,
+                  color: palette.ink,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                {activeStep.sub}
+              </h3>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                  gap: 32,
+                  marginTop: 22,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: palette.petrol,
+                      fontWeight: 600,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Hva skjer
+                  </div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.6, margin: 0, color: '#3A3631' }}>{activeStep.hva}</p>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: palette.moss,
+                      fontWeight: 600,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Hva kontrolleres
+                  </div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.6, margin: 0, color: '#3A3631' }}>{activeStep.kontroll}</p>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: palette.rust,
+                      fontWeight: 600,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Ved avvik
+                  </div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.6, margin: 0, color: '#3A3631' }}>{activeStep.avvik}</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                color: palette.muted,
+                fontSize: 13.5,
+                textAlign: 'center',
+                fontStyle: 'italic',
+                fontFamily: '"Fraunces", serif',
+                paddingTop: 40,
+              }}
+            >
+              Trykk på et steg over for å se hva som skjer i praksis.
+            </div>
+          )}
+        </div>
+
+        <footer
+          style={{
+            marginTop: 56,
+            paddingTop: 22,
+            borderTop: `1px solid ${palette.line}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            fontSize: 12,
+            color: palette.muted,
+            gap: 16,
+            letterSpacing: '0.02em',
+          }}
+        >
+          <span>Verminord AS · SOP 01 — Forkompostering</span>
+          <span
+            style={{
+              fontStyle: 'italic',
+              fontFamily: '"Fraunces", serif',
+              color: '#5A5650',
+            }}
+          >
+            laget av dyrkere, for dyrkere
+          </span>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<VerminordForkompostering />);
+
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) {
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 500);
+  }
+}, 200);
+</script>
+</body>
+</html>

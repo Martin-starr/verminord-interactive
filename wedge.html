@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verminord — Wedge-systemet</title>
+<meta name="description" content="Marken jobber seg gjennom batchen — fra fôringsside til moden side." />
+<meta property="og:title" content="Verminord — Wedge-systemet" />
+<meta property="og:description" content="Marken jobber seg gjennom batchen — fra fôringsside til moden side." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html, body, #root { margin: 0; padding: 0; }
+  body {
+    background: #F1EADC;
+    color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  #loader {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #F1EADC; color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    z-index: 9999;
+    transition: opacity 0.4s ease;
+  }
+  #loader.hidden { opacity: 0; pointer-events: none; }
+  .loader-text {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #A07A52;
+    font-weight: 600;
+  }
+  /* number inputs */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</head>
+<body>
+<div id="loader"><div class="loader-text">Laster Verminord…</div></div>
+<div id="root"></div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo } = React;
+
+const palette = {
+  bg: '#F1EADC',
+  paper: '#FAF5EA',
+  ink: '#1A1816',
+  petrol: '#1E4D6B',
+  petrolDark: '#143548',
+  warm: '#A07A52',
+  moss: '#5C6B3F',
+  muted: '#9B948A',
+  line: '#C9BFAE',
+  rust: '#B86B3E',
+  earth: '#5A4530',
+  earthLight: '#8A6B47',
+  castings: '#3A2E22',
+};
+
+const zones = [
+  {
+    id: 'moden',
+    label: 'Moden side',
+    sub: 'Klar for høsting',
+    xRange: [0, 0.33],
+    color: palette.moss,
+    accent: '#7A8556',
+    detail:
+      'Den eldste delen av wedgen — materialet her er ferdig bearbeidet, mørkt, smuldret og jordaktig. Marken har stort sett trukket seg vekk fordi det ikke lenger er fersk mat her.',
+    routine:
+      'Vi fjerner tildekkingen dagen før høsting, så de siste markene rekker å trekke seg mot fôringssiden. Deretter tas materialet ut og kjøres til sikting.',
+    sjekk: 'Lukt: rein jord. Struktur: krummet og smuldret. Fukt: jevn, ikke våt.',
+  },
+  {
+    id: 'arbeid',
+    label: 'Arbeidssone',
+    sub: 'Aktiv biologi · høyest tetthet',
+    xRange: [0.33, 0.67],
+    color: palette.petrol,
+    accent: '#3D6E89',
+    detail:
+      'Hjertet av wedgen. Her er marken på sitt mest aktive — den bryter ned forkomposten, blander biologi inn i materialet og lager den karakteristiske krummede strukturen.',
+    routine:
+      'Daglig observasjon: lukt, fuktighet, lufttilgang, synlig aktivitet. Korreksjon ved behov — vann ved tørke, lufting hvis det blir tett.',
+    sjekk: 'Jevn fuktighet, ingen anaerob lukt, ingen stillestående vann. Marken skal være aktiv ved berøring.',
+  },
+  {
+    id: 'foring',
+    label: 'Fôringsside',
+    sub: 'Tynne lag med fersk forkompost',
+    xRange: [0.67, 1.0],
+    color: palette.rust,
+    accent: '#C77B4D',
+    detail:
+      'Den aktive fôringssiden. Her legges fersk, moden forkompost i tynne, kontrollerte lag på toppen. Marken migrerer hit fordi det er her maten er. Dekket av papp eller løv som beskytter mot lys og tørke.',
+    routine:
+      '5–10 cm lag forkompost over aktiv del. Lett vanning. Dekk med papp eller løvblader. Aldri grav marken ned under et tungt, kompakt lag.',
+    sjekk: 'Material lukter jordaktig før det legges på. Ingen varm, sur eller ustabil batch fôres direkte.',
+  },
+];
+
+// pre-generated worm positions/density
+const worms = Array.from({ length: 60 }, (_, i) => {
+  // density skewed toward right (feeding side)
+  const skew = Math.pow(Math.random(), 0.45);
+  return {
+    x: 0.05 + skew * 0.9,
+    y: 0.25 + Math.random() * 0.55,
+    size: 4 + Math.random() * 6,
+    delay: Math.random() * 4,
+    duration: 6 + Math.random() * 5,
+    flip: Math.random() > 0.5,
+  };
+});
+
+function VerminordWedge() {
+  const [active, setActive] = useState(null);
+  const [hovered, setHovered] = useState(null);
+
+  
+
+  const activeZone = zones.find((z) => z.id === active);
+  const W = 1200;
+  const H = 560;
+  // bed box
+  const bedX = 80;
+  const bedY = 140;
+  const bedW = W - 160;
+  const bedH = 280;
+
+  return (
+    <div
+      style={{
+        fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+        background: palette.bg,
+        color: palette.ink,
+        minHeight: '100vh',
+        padding: '48px 28px 56px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div style={{ maxWidth: 1220, margin: '0 auto' }}>
+        <header style={{ marginBottom: 12 }}>
+          <div
+            style={{
+              fontSize: 10.5,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: palette.warm,
+              fontWeight: 600,
+            }}
+          >
+            Verminord — Wedge-system
+          </div>
+          <h1
+            style={{
+              fontFamily: '"Fraunces", serif',
+              fontSize: 'clamp(34px, 5.6vw, 64px)',
+              lineHeight: 1.02,
+              margin: '14px 0 0 0',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              maxWidth: 920,
+              fontVariationSettings: '"opsz" 144',
+            }}
+          >
+            Marken jobber{' '}
+            <em
+              style={{
+                fontStyle: 'italic',
+                color: palette.petrol,
+                fontWeight: 500,
+              }}
+            >
+              i én retning
+            </em>
+          </h1>
+          <p
+            style={{
+              fontSize: 15.5,
+              lineHeight: 1.6,
+              maxWidth: 680,
+              margin: '22px 0 0 0',
+              color: '#3A3631',
+            }}
+          >
+            Et wedge-system utnytter noe enkelt: meitemarken vil alltid bevege seg mot fersk mat. Vi mater bare
+            den ene siden, så migrerer marken dit av seg selv — og lar den motsatte siden modne ferdig til
+            høsting. Trykk på sonene for å se hva som skjer.
+          </p>
+        </header>
+
+        <div style={{ position: 'relative', marginTop: 8 }}>
+          <svg
+            viewBox={`0 0 ${W} ${H}`}
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <filter id="grain-wd">
+                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+                <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.03 0" />
+              </filter>
+              {/* bed material gradient: mature dark left → fresh warm right */}
+              <linearGradient id="bedGrad" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor={palette.castings} />
+                <stop offset="50%" stopColor={palette.earth} />
+                <stop offset="100%" stopColor={palette.earthLight} />
+              </linearGradient>
+              {/* top mulch / cover */}
+              <linearGradient id="mulchGrad" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor="#9B8A6B" stopOpacity="0.0" />
+                <stop offset="60%" stopColor="#9B8A6B" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="#A67D52" stopOpacity="1" />
+              </linearGradient>
+              {/* fresh feed wedge on right */}
+              <linearGradient id="feedGrad" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor="#7E5B3A" stopOpacity="0" />
+                <stop offset="100%" stopColor="#A87047" stopOpacity="0.95" />
+              </linearGradient>
+              <marker id="arrowW" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill={palette.warm} />
+              </marker>
+            </defs>
+
+            {/* Direction arrow above bed */}
+            <g style={{ opacity: 0, animation: 'fadeInW 1s 0.3s ease-out forwards' }}>
+              <text
+                x={bedX + bedW * 0.18}
+                y={bedY - 40}
+                fill={palette.moss}
+                style={{ fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600 }}
+              >
+                ← Høsting
+              </text>
+              <text
+                x={bedX + bedW * 0.5}
+                y={bedY - 40}
+                textAnchor="middle"
+                fill={palette.muted}
+                style={{
+                  fontSize: 11,
+                  fontFamily: '"Fraunces", serif',
+                  fontStyle: 'italic',
+                }}
+              >
+                marken migrerer mot mat →
+              </text>
+              <text
+                x={bedX + bedW * 0.82}
+                y={bedY - 40}
+                textAnchor="end"
+                fill={palette.rust}
+                style={{ fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600 }}
+              >
+                Fôring →
+              </text>
+              <line
+                x1={bedX + bedW * 0.3}
+                y1={bedY - 25}
+                x2={bedX + bedW * 0.7}
+                y2={bedY - 25}
+                stroke={palette.warm}
+                strokeWidth="1"
+                strokeDasharray="3 3"
+                markerEnd="url(#arrowW)"
+              />
+            </g>
+
+            {/* Bed support legs */}
+            <rect x={bedX + 30} y={bedY + bedH} width="14" height="60" fill={palette.ink} opacity="0.85" />
+            <rect x={bedX + bedW - 44} y={bedY + bedH} width="14" height="60" fill={palette.ink} opacity="0.85" />
+            <rect x={bedX} y={bedY + bedH - 4} width={bedW} height="8" fill={palette.ink} opacity="0.85" />
+
+            {/* Bed body — main material */}
+            <rect x={bedX} y={bedY} width={bedW} height={bedH} fill="url(#bedGrad)" />
+
+            {/* Fresh feed wedge on right side (the "wedge" shape) */}
+            <path
+              d={`M ${bedX + bedW * 0.55} ${bedY}
+                  L ${bedX + bedW} ${bedY}
+                  L ${bedX + bedW} ${bedY + 70}
+                  L ${bedX + bedW * 0.55} ${bedY + 30}
+                  Z`}
+              fill="url(#feedGrad)"
+            />
+
+            {/* Top mulch cover (cardboard/leaves) — only over middle and feeding zones */}
+            <rect
+              x={bedX + bedW * 0.33}
+              y={bedY}
+              width={bedW * 0.67}
+              height={20}
+              fill="url(#mulchGrad)"
+              opacity="0.85"
+            />
+            {/* texture lines for mulch */}
+            {Array.from({ length: 20 }, (_, i) => {
+              const xL = bedX + bedW * 0.34 + i * (bedW * 0.65 / 20);
+              return (
+                <line
+                  key={`mulch-${i}`}
+                  x1={xL}
+                  y1={bedY + 2}
+                  x2={xL + 4}
+                  y2={bedY + 18}
+                  stroke={palette.bg}
+                  strokeWidth="0.6"
+                  opacity="0.5"
+                />
+              );
+            })}
+
+            {/* Zone separators (dashed) */}
+            {[0.33, 0.67].map((p, i) => (
+              <line
+                key={`sep-${i}`}
+                x1={bedX + bedW * p}
+                y1={bedY - 8}
+                x2={bedX + bedW * p}
+                y2={bedY + bedH + 12}
+                stroke={palette.line}
+                strokeWidth="0.6"
+                strokeDasharray="2 4"
+                opacity="0.7"
+              />
+            ))}
+
+            {/* Worms — density gradient toward feeding side */}
+            {worms.map((w, i) => {
+              const wx = bedX + w.x * bedW;
+              const wy = bedY + w.y * bedH;
+              return (
+                <g
+                  key={`worm-${i}`}
+                  style={{
+                    opacity: 0,
+                    animation: `wormIn 1s ${0.5 + i * 0.02}s ease-out forwards`,
+                  }}
+                >
+                  <path
+                    d={`M ${wx - w.size / 2} ${wy} q ${w.size / 4} ${-w.size / 3} ${w.size / 2} 0 t ${w.size / 2} 0`}
+                    fill="none"
+                    stroke={palette.castings}
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    opacity="0.85"
+                  >
+                    <animateTransform
+                      attributeName="transform"
+                      type="translate"
+                      values="0 0; 6 -2; 0 0; -3 2; 0 0"
+                      dur={`${w.duration}s`}
+                      begin={`${w.delay}s`}
+                      repeatCount="indefinite"
+                    />
+                  </path>
+                </g>
+              );
+            })}
+
+            {/* Clickable zone overlays */}
+            {zones.map((z, i) => {
+              const xL = bedX + bedW * z.xRange[0];
+              const xR = bedX + bedW * z.xRange[1];
+              const isActive = active === z.id;
+              const isHover = hovered === z.id;
+              return (
+                <g
+                  key={z.id}
+                  onClick={() => setActive(isActive ? null : z.id)}
+                  onMouseEnter={() => setHovered(z.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <rect
+                    x={xL}
+                    y={bedY - 10}
+                    width={xR - xL}
+                    height={bedH + 20}
+                    fill={z.accent}
+                    opacity={isActive ? 0.18 : isHover ? 0.08 : 0}
+                    style={{ transition: 'opacity 0.3s' }}
+                  />
+                  {/* Active border */}
+                  <rect
+                    x={xL}
+                    y={bedY}
+                    width={xR - xL}
+                    height={bedH}
+                    fill="none"
+                    stroke={z.color}
+                    strokeWidth={isActive ? 2 : 0}
+                    style={{ transition: 'stroke-width 0.3s' }}
+                  />
+                  {/* Zone label below bed */}
+                  <text
+                    x={(xL + xR) / 2}
+                    y={bedY + bedH + 92}
+                    textAnchor="middle"
+                    fill={palette.ink}
+                    style={{
+                      fontFamily: '"Fraunces", serif',
+                      fontSize: 18,
+                      fontWeight: 500,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {z.label}
+                  </text>
+                  <text
+                    x={(xL + xR) / 2}
+                    y={bedY + bedH + 112}
+                    textAnchor="middle"
+                    fill={z.color}
+                    style={{
+                      fontSize: 11,
+                      fontStyle: 'italic',
+                      fontFamily: '"Fraunces", serif',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {z.sub}
+                  </text>
+                </g>
+              );
+            })}
+
+            <rect width={W} height={H} filter="url(#grain-wd)" opacity="0.6" pointerEvents="none" />
+          </svg>
+
+          <style>{`
+            @keyframes fadeInW {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes wormIn {
+              from { opacity: 0; transform: scale(0.6); }
+              to { opacity: 0.85; transform: scale(1); }
+            }
+          `}</style>
+        </div>
+
+        <div
+          style={{
+            marginTop: 8,
+            background: activeZone ? palette.paper : 'transparent',
+            border: activeZone ? `1px solid ${palette.line}` : '1px dashed transparent',
+            padding: '28px 30px',
+            minHeight: 180,
+            transition: 'background 0.3s ease, border-color 0.3s ease',
+          }}
+        >
+          {activeZone ? (
+            <div>
+              <div
+                style={{
+                  fontSize: 10,
+                  letterSpacing: '0.24em',
+                  textTransform: 'uppercase',
+                  color: activeZone.color,
+                  fontWeight: 700,
+                  marginBottom: 8,
+                }}
+              >
+                {activeZone.label}
+              </div>
+              <h3
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontSize: 26,
+                  lineHeight: 1.18,
+                  margin: 0,
+                  fontWeight: 500,
+                  letterSpacing: '-0.01em',
+                  color: palette.ink,
+                }}
+              >
+                <em style={{ fontStyle: 'italic', color: activeZone.color }}>{activeZone.sub}</em>
+              </h3>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                  gap: 32,
+                  marginTop: 22,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: palette.warm,
+                      fontWeight: 600,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Hva skjer her
+                  </div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.62, margin: 0, color: '#3A3631' }}>{activeZone.detail}</p>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: palette.petrol,
+                      fontWeight: 600,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Daglig rutine
+                  </div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.62, margin: 0, color: '#3A3631' }}>{activeZone.routine}</p>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: palette.moss,
+                      fontWeight: 600,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Sjekk
+                  </div>
+                  <p
+                    style={{
+                      fontSize: 14.5,
+                      lineHeight: 1.62,
+                      margin: 0,
+                      color: '#3A3631',
+                      fontFamily: '"Fraunces", serif',
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {activeZone.sjekk}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                color: palette.muted,
+                fontSize: 13.5,
+                textAlign: 'center',
+                fontStyle: 'italic',
+                fontFamily: '"Fraunces", serif',
+                paddingTop: 40,
+              }}
+            >
+              Trykk på en sone over for å se hva som skjer der.
+            </div>
+          )}
+        </div>
+
+        <footer
+          style={{
+            marginTop: 56,
+            paddingTop: 22,
+            borderTop: `1px solid ${palette.line}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            fontSize: 12,
+            color: palette.muted,
+            gap: 16,
+            letterSpacing: '0.02em',
+          }}
+        >
+          <span>Verminord AS · Wedge-system — horisontal vermikompostering</span>
+          <span
+            style={{
+              fontStyle: 'italic',
+              fontFamily: '"Fraunces", serif',
+              color: '#5A5650',
+            }}
+          >
+            laget av dyrkere, for dyrkere
+          </span>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<VerminordWedge />);
+
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) {
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 500);
+  }
+}, 200);
+</script>
+</body>
+</html>

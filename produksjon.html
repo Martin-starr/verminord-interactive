@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verminord — Produksjonsflyt</title>
+<meta name="description" content="Hele veien fra råvare til ferdig pakket VermiCast." />
+<meta property="og:title" content="Verminord — Produksjonsflyt" />
+<meta property="og:description" content="Hele veien fra råvare til ferdig pakket VermiCast." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Schibsted+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  html, body, #root { margin: 0; padding: 0; }
+  body {
+    background: #F1EADC;
+    color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  #loader {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #F1EADC; color: #1A1816;
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    z-index: 9999;
+    transition: opacity 0.4s ease;
+  }
+  #loader.hidden { opacity: 0; pointer-events: none; }
+  .loader-text {
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #A07A52;
+    font-weight: 600;
+  }
+  /* number inputs */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] { -moz-appearance: textfield; }
+</style>
+</head>
+<body>
+<div id="loader"><div class="loader-text">Laster Verminord…</div></div>
+<div id="root"></div>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo } = React;
+
+const palette = {
+  bg: '#F1EADC',
+  paper: '#FAF5EA',
+  ink: '#1A1816',
+  petrol: '#1E4D6B',
+  petrolDark: '#143548',
+  warm: '#A07A52',
+  moss: '#5C6B3F',
+  muted: '#9B948A',
+  line: '#C9BFAE',
+  rust: '#B86B3E',
+};
+
+const stages = [
+  {
+    id: 'raavarer',
+    n: '01',
+    label: 'Råvarer',
+    sub: 'Lokale, rene innsatsmaterialer',
+    color: palette.warm,
+    duration: 'Løpende',
+    detail:
+      'Llama-møkk fra lokal gård, brukt soppsubstrat fra lokale soppdyrkere, rene høstløv, papp og sagflis. Hvert parti inspiseres for forurensning og loggføres ved mottak.',
+    output: 'Sortert og lagret per type',
+  },
+  {
+    id: 'forkompost',
+    n: '02',
+    label: 'Forkompost',
+    sub: 'Blanding · varme · modning',
+    color: palette.rust,
+    duration: '3–6 uker',
+    detail:
+      'Råvarene blandes etter intern oppskrift, fuktes og settes til termofil aktiv kompostering. Temperatur, lukt og struktur følges til materialet er stabilt og jordaktig — trygt nok til å fôre marken med.',
+    output: 'Stabil, moden forkompost',
+  },
+  {
+    id: 'markrom',
+    n: '03',
+    label: 'Markrom',
+    sub: 'Eisenia fetida · wedge-system',
+    color: palette.petrol,
+    duration: '8–12 uker',
+    detail:
+      'Forkomposten legges som et tynt lag på den aktive siden av wedgen. Marken bearbeider materialet over uker, omdanner det til strukturrike støp og migrerer mot ny mat. Daglig kontroll av fukt, lukt og aktivitet.',
+    output: 'Ferdig vermikompost i wedgen',
+  },
+  {
+    id: 'hoesting',
+    n: '04',
+    label: 'Høsting',
+    sub: 'Uttak fra moden side',
+    color: palette.moss,
+    duration: 'Per batch',
+    detail:
+      'Vi tar ut det modne materialet fra høstesiden av wedgen. Tildekkingen fjernes dagen før så marken trekker seg vekk. Kun stabilt materiale med god krummestruktur og jordduft tas videre.',
+    output: 'Rå støp klar for sikting',
+  },
+  {
+    id: 'sikting',
+    n: '05',
+    label: 'Sikting',
+    sub: 'Profesjonell sifter',
+    color: palette.petrol,
+    duration: 'Per batch',
+    detail:
+      'Materialet kjøres gjennom profesjonell sifter. Castings skilles fra grove fraksjoner og gjenværende mark. Mark og brukbar overstørrelse går tilbake i prosessen — ingenting kastes unødig.',
+    output: 'Ren, finsiktet VermiCast',
+  },
+  {
+    id: 'pakking',
+    n: '06',
+    label: 'Pakking',
+    sub: '5 L pustende poser · batch-stemplet',
+    color: palette.warm,
+    duration: 'Per batch',
+    detail:
+      'VermiCast fylles i 5-liters PP-vevde poser. Hver pose stemples med Batch-ID og dato, så hver sekk kan spores tilbake til input, forkompost og wedge.',
+    output: 'Merkede, sporbare poser',
+  },
+  {
+    id: 'lager',
+    n: '07',
+    label: 'VermiCast',
+    sub: 'Klar for kunde',
+    color: palette.moss,
+    duration: 'På lager',
+    detail:
+      'Ferdig produkt lagres adskilt fra aktive prosessområder. Klar for direkte salg, distribusjonspartnere eller henting. Hver batch har dokumentert lab-analyse fra ALS Laboratory Norway tilgjengelig.',
+    output: 'Premium norsk vermikompost',
+  },
+];
+
+const inputs = ['Llama-møkk', 'Soppsubstrat', 'Løvmold', 'Papp', 'Sagflis'];
+
+function VerminordProduksjon() {
+  const [active, setActive] = useState(null);
+  const [hovered, setHovered] = useState(null);
+
+  
+
+  const activeStage = stages.find((s) => s.id === active);
+
+  const W = 1200;
+  const H = 520;
+  const Y = 280;
+  const stageW = 130;
+  const stageH = 90;
+  const total = stages.length;
+  const startX = 80;
+  const endX = W - 80;
+  const stepX = (endX - startX - stageW) / (total - 1);
+
+  return (
+    <div
+      style={{
+        fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+        background: palette.bg,
+        color: palette.ink,
+        minHeight: '100vh',
+        padding: '48px 28px 56px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div style={{ maxWidth: 1220, margin: '0 auto' }}>
+        <header style={{ marginBottom: 12 }}>
+          <div
+            style={{
+              fontSize: 10.5,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: palette.warm,
+              fontWeight: 600,
+            }}
+          >
+            Verminord — Produksjonsflyt
+          </div>
+          <h1
+            style={{
+              fontFamily: '"Fraunces", serif',
+              fontSize: 'clamp(34px, 5.6vw, 64px)',
+              lineHeight: 1.02,
+              margin: '14px 0 0 0',
+              fontWeight: 400,
+              letterSpacing: '-0.02em',
+              maxWidth: 920,
+              fontVariationSettings: '"opsz" 144',
+            }}
+          >
+            Fra lokale råvarer{' '}
+            <em
+              style={{
+                fontStyle: 'italic',
+                color: palette.petrol,
+                fontWeight: 500,
+              }}
+            >
+              til levende jord
+            </em>
+          </h1>
+          <p
+            style={{
+              fontSize: 15.5,
+              lineHeight: 1.6,
+              maxWidth: 680,
+              margin: '22px 0 0 0',
+              color: '#3A3631',
+            }}
+          >
+            Hele produksjonen, syv steg fra mottak til ferdig pose. Hver batch loggføres, hver pose er sporbar
+            tilbake til råvarene den begynte som. Trykk på et trinn for å se hva som skjer der.
+          </p>
+        </header>
+
+        <div style={{ position: 'relative', marginTop: 8 }}>
+          <svg
+            viewBox={`0 0 ${W} ${H}`}
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <filter id="grain-pr">
+                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+                <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.03 0" />
+              </filter>
+              <marker
+                id="arrow"
+                viewBox="0 0 10 10"
+                refX="8"
+                refY="5"
+                markerWidth="6"
+                markerHeight="6"
+                orient="auto"
+              >
+                <path d="M 0 0 L 10 5 L 0 10 z" fill={palette.line} />
+              </marker>
+            </defs>
+
+            {/* Input feeders coming down into stage 1 */}
+            {inputs.map((inp, i) => {
+              const xStart = startX + 15 + i * 25;
+              const yStart = 60;
+              const xEnd = startX + stageW / 2;
+              const yEnd = Y;
+              return (
+                <g key={inp} style={{ opacity: 0, animation: `fadeIn 0.8s ${i * 0.1}s ease-out forwards` }}>
+                  <text
+                    x={xStart}
+                    y={yStart - 8}
+                    textAnchor="middle"
+                    fill={palette.muted}
+                    style={{
+                      fontSize: 9.5,
+                      fontStyle: 'italic',
+                      fontFamily: '"Fraunces", serif',
+                    }}
+                    transform={`rotate(-35, ${xStart}, ${yStart - 8})`}
+                  >
+                    {inp}
+                  </text>
+                  <path
+                    d={`M ${xStart} ${yStart} Q ${xStart} ${(yStart + yEnd) / 2} ${xEnd} ${yEnd}`}
+                    fill="none"
+                    stroke={palette.line}
+                    strokeWidth="0.8"
+                    strokeDasharray="2 4"
+                  />
+                  <circle cx={xStart} cy={yStart} r="2.5" fill={palette.warm} />
+                </g>
+              );
+            })}
+
+            {/* Main flow line */}
+            <line
+              x1={startX + stageW}
+              y1={Y + stageH / 2}
+              x2={endX - stageW + stageW}
+              y2={Y + stageH / 2}
+              stroke={palette.line}
+              strokeWidth="1"
+              strokeDasharray="3 4"
+            />
+
+            {/* Stage boxes */}
+            {stages.map((s, i) => {
+              const x = startX + i * stepX;
+              const isActive = active === s.id;
+              const isHover = hovered === s.id;
+              return (
+                <g
+                  key={s.id}
+                  onClick={() => setActive(isActive ? null : s.id)}
+                  onMouseEnter={() => setHovered(s.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    cursor: 'pointer',
+                    opacity: 0,
+                    animation: `fadeIn 0.7s ${0.3 + i * 0.07}s ease-out forwards`,
+                  }}
+                >
+                  {/* hover halo */}
+                  <rect
+                    x={x - 4}
+                    y={Y - 4}
+                    width={stageW + 8}
+                    height={stageH + 8}
+                    fill="none"
+                    stroke={s.color}
+                    strokeWidth="1"
+                    opacity={isHover && !isActive ? 0.35 : 0}
+                    style={{ transition: 'opacity 0.25s' }}
+                  />
+                  <rect
+                    x={x}
+                    y={Y}
+                    width={stageW}
+                    height={stageH}
+                    fill={isActive ? s.color : palette.paper}
+                    stroke={isActive ? s.color : palette.ink}
+                    strokeWidth={isActive ? 0 : 1}
+                    style={{ transition: 'all 0.3s ease' }}
+                  />
+                  {/* step number top-left */}
+                  <text
+                    x={x + 10}
+                    y={Y + 18}
+                    fill={isActive ? palette.bg : palette.muted}
+                    style={{
+                      fontSize: 9.5,
+                      letterSpacing: '0.18em',
+                      fontWeight: 600,
+                      transition: 'fill 0.3s',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {s.n}
+                  </text>
+                  {/* label centered */}
+                  <text
+                    x={x + stageW / 2}
+                    y={Y + stageH / 2 + 4}
+                    textAnchor="middle"
+                    fill={isActive ? palette.bg : palette.ink}
+                    style={{
+                      fontFamily: '"Fraunces", serif',
+                      fontSize: 17,
+                      fontWeight: 500,
+                      transition: 'fill 0.3s',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {s.label}
+                  </text>
+                  {/* duration bottom */}
+                  <text
+                    x={x + stageW / 2}
+                    y={Y + stageH - 12}
+                    textAnchor="middle"
+                    fill={isActive ? palette.bg : palette.muted}
+                    opacity={isActive ? 0.85 : 1}
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.1em',
+                      transition: 'fill 0.3s',
+                      pointerEvents: 'none',
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {s.duration}
+                  </text>
+
+                  {/* connector arrow */}
+                  {i < total - 1 && (
+                    <line
+                      x1={x + stageW + 2}
+                      y1={Y + stageH / 2}
+                      x2={x + stepX - 2}
+                      y2={Y + stageH / 2}
+                      stroke={palette.line}
+                      strokeWidth="1.2"
+                      markerEnd="url(#arrow)"
+                    />
+                  )}
+                </g>
+              );
+            })}
+
+            {/* Bottom annotation: traceability */}
+            <line
+              x1={startX}
+              y1={Y + stageH + 50}
+              x2={endX}
+              y2={Y + stageH + 50}
+              stroke={palette.petrol}
+              strokeWidth="0.6"
+              opacity="0.5"
+            />
+            <text
+              x={startX}
+              y={Y + stageH + 70}
+              fill={palette.petrol}
+              style={{
+                fontSize: 10,
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                fontWeight: 600,
+              }}
+            >
+              ← Sporbarhet: Batch-ID følger materialet gjennom hele kjeden →
+            </text>
+
+            <rect width={W} height={H} filter="url(#grain-pr)" opacity="0.6" pointerEvents="none" />
+          </svg>
+
+          <style>{`
+            @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(6px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          `}</style>
+        </div>
+
+        <div
+          style={{
+            marginTop: 8,
+            background: activeStage ? palette.paper : 'transparent',
+            border: activeStage ? `1px solid ${palette.line}` : '1px dashed transparent',
+            padding: '28px 30px',
+            minHeight: 170,
+            transition: 'background 0.3s ease, border-color 0.3s ease',
+          }}
+        >
+          {activeStage ? (
+            <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: 14,
+                  marginBottom: 10,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 10,
+                    letterSpacing: '0.24em',
+                    textTransform: 'uppercase',
+                    color: activeStage.color,
+                    fontWeight: 700,
+                  }}
+                >
+                  Trinn {activeStage.n}
+                </span>
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: palette.muted,
+                    fontFamily: '"Fraunces", serif',
+                    fontStyle: 'italic',
+                  }}
+                >
+                  varighet: {activeStage.duration}
+                </span>
+              </div>
+              <h3
+                style={{
+                  fontFamily: '"Fraunces", serif',
+                  fontSize: 28,
+                  lineHeight: 1.18,
+                  margin: 0,
+                  fontWeight: 500,
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                {activeStage.label} —{' '}
+                <em style={{ fontStyle: 'italic', color: activeStage.color }}>{activeStage.sub}</em>
+              </h3>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                  gap: 32,
+                  marginTop: 22,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: palette.warm,
+                      fontWeight: 600,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Hva skjer
+                  </div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.62, margin: 0, color: '#3A3631' }}>{activeStage.detail}</p>
+                </div>
+                <div>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: '0.2em',
+                      textTransform: 'uppercase',
+                      color: palette.moss,
+                      fontWeight: 600,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Resultat ut
+                  </div>
+                  <p
+                    style={{
+                      fontSize: 14.5,
+                      lineHeight: 1.62,
+                      margin: 0,
+                      color: '#3A3631',
+                      fontFamily: '"Fraunces", serif',
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {activeStage.output}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                color: palette.muted,
+                fontSize: 13.5,
+                textAlign: 'center',
+                fontStyle: 'italic',
+                fontFamily: '"Fraunces", serif',
+                paddingTop: 38,
+              }}
+            >
+              Trykk på et trinn for å se hva som skjer på det stadiet.
+            </div>
+          )}
+        </div>
+
+        <footer
+          style={{
+            marginTop: 56,
+            paddingTop: 22,
+            borderTop: `1px solid ${palette.line}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            fontSize: 12,
+            color: palette.muted,
+            gap: 16,
+            letterSpacing: '0.02em',
+          }}
+        >
+          <span>Verminord AS · Produksjonsflyt fra råvarer til VermiCast</span>
+          <span
+            style={{
+              fontStyle: 'italic',
+              fontFamily: '"Fraunces", serif',
+              color: '#5A5650',
+            }}
+          >
+            laget av dyrkere, for dyrkere
+          </span>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<VerminordProduksjon />);
+
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) {
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 500);
+  }
+}, 200);
+</script>
+</body>
+</html>
