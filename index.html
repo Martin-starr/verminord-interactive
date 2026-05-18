@@ -56,7 +56,6 @@ const Shield = makeIcon(['M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.
 const Leaf = makeIcon(['M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19.2 2.3c1 3.2.5 7.3-2 9.7-2.4 2.4-5.6 2.5-8.6 1.8','M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12']);
 const FlaskConical = makeIcon(['M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2','M6.453 15h11.094','M8.5 2h7']);
 const Activity = makeIcon(['M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.5.5 0 0 1-.96 0L9.24 3.18a.5.5 0 0 0-.96 0l-2.35 8.36A2 2 0 0 1 4 13H2']);
-const Printer = makeIcon(['M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2','M6 9V2h12v7','M6 14h12v8H6z']);
 const GraduationCap = makeIcon(['M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z','M22 10v6','M6 12.5V16a6 3 0 0 0 12 0v-3.5']);
 const School = makeIcon(['M14 22v-4a2 2 0 1 0-4 0v4','m18 10 4 2v10','M18 5v17','m4 6 8-4 8 4','M4 18H2','M4 12H2','M4 22V6']);
 const Wheat = makeIcon(['M2 22 16 8','M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z','M7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z','M11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z']);
@@ -5970,10 +5969,6 @@ function VerminordDoc() {
 
   const activePartnerData = RIPPLE_PARTNERS.find((p) => p.id === activePartner);
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   const sections = [
     { id: 'intro', label: 'Intro' },
     { id: 'process', label: 'Slik gjør vi det' },
@@ -6118,27 +6113,6 @@ function VerminordDoc() {
             >
               Verminord
             </div>
-            <button
-              onClick={handlePrint}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '8px 14px',
-                background: 'transparent',
-                border: `1px solid ${palette.ink}`,
-                borderRadius: 999,
-                fontSize: 11.5,
-                fontWeight: 500,
-                color: palette.ink,
-                cursor: 'pointer',
-                fontFamily: 'inherit',
-                letterSpacing: '0.04em',
-              }}
-            >
-              <Printer size={13} strokeWidth={2} />
-              Lagre som PDF
-            </button>
           </div>
           <div
             style={{
