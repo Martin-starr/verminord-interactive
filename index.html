@@ -2144,7 +2144,7 @@ const WedgeSection = (() => {
                   x={bedX + bedW * 0.18}
                   y={bedY - 40}
                   fill={palette.moss}
-                  style={{ fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600 }}
+                  style={{ fontSize: 18, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600 }}
                 >
                   ← Høsting
                 </text>
@@ -2166,7 +2166,7 @@ const WedgeSection = (() => {
                   y={bedY - 40}
                   textAnchor="end"
                   fill={palette.rust}
-                  style={{ fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600 }}
+                  style={{ fontSize: 18, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600 }}
                 >
                   Fôring →
                 </text>
@@ -2872,7 +2872,7 @@ const CFTSection = (() => {
                   y={bedY - 28}
                   textAnchor="middle"
                   fill={palette.rust}
-                  style={{ fontSize: 10.5, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600 }}
+                  style={{ fontSize: 17, letterSpacing: '0.24em', textTransform: 'uppercase', fontWeight: 600 }}
                 >
                   Fôring inn
                 </text>
@@ -2997,7 +2997,7 @@ const CFTSection = (() => {
                   y={bedY + 30}
                   textAnchor="end"
                   fill={palette.rust}
-                  style={{ fontSize: 10.5, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
+                  style={{ fontSize: 17, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
                 >
                   Topp
                 </text>
@@ -3020,7 +3020,7 @@ const CFTSection = (() => {
                   y={bedY + bedH - 30}
                   textAnchor="end"
                   fill={palette.moss}
-                  style={{ fontSize: 10.5, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
+                  style={{ fontSize: 17, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
                 >
                   Bunn
                 </text>
@@ -3055,7 +3055,7 @@ const CFTSection = (() => {
                   textAnchor="middle"
                   fill={palette.warm}
                   style={{
-                    fontSize: 10,
+                    fontSize: 17,
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
                     fontWeight: 600,
@@ -5814,18 +5814,13 @@ function VerminordDoc() {
         }}
       >
         <div
-          style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', flexShrink: 0 }}
+          style={{ display: 'flex', alignItems: 'baseline', gap: 8, cursor: 'pointer', flexShrink: 0 }}
           onClick={() => {
             setActiveSection('intro');
             const el = document.getElementById('section-intro');
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
         >
-          <img
-            src="logo-white.svg"
-            alt="Verminord"
-            style={{ height: 36, width: 'auto', display: 'block' }}
-          />
           <span
             style={{
               color: 'white',
@@ -5837,6 +5832,18 @@ function VerminordDoc() {
             }}
           >
             Verminord
+          </span>
+          <span
+            style={{
+              color: 'white',
+              fontFamily: '"IBM Plex Sans", sans-serif',
+              fontSize: 14,
+              fontWeight: 400,
+              fontStyle: 'italic',
+              letterSpacing: '0.01em',
+            }}
+          >
+            — For dyrkere. Av dyrkere.
           </span>
         </div>
         <div className="nav-links" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 28px', alignItems: 'center' }}>
