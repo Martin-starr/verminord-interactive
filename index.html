@@ -5735,43 +5735,16 @@ function VerminordDoc() {
 
   const activePartnerData = RIPPLE_PARTNERS.find((p) => p.id === activePartner);
 
-  const sectionGroups = [
-    {
-      label: 'Oversikt',
-      items: [
-        { id: 'intro', label: 'Intro' },
-        { id: 'process', label: 'Prosessen' },
-      ],
-    },
-    {
-      label: 'Produksjon',
-      items: [
-        { id: 'raavarer', label: 'Råvarer' },
-        { id: 'forkompostering', label: 'Forkompostering' },
-        { id: 'wedge', label: 'Wedge' },
-        { id: 'cft', label: 'CFT' },
-        { id: 'produksjon', label: 'Produksjonsflyt' },
-      ],
-    },
-    {
-      label: 'Dokumentasjon',
-      items: [
-        { id: 'eisenia', label: 'Eisenia fetida' },
-        { id: 'lab-dashboard', label: 'Lab-dashboard' },
-        { id: 'lab', label: 'Lab-data' },
-      ],
-    },
-    {
-      label: 'Bruk & sesong',
-      items: [
-        { id: 'bruk', label: 'Bruksguide' },
-        { id: 'sesong', label: 'Sesongkalender' },
-        { id: 'ripples', label: 'Ringvirkninger' },
-      ],
-    },
+  const navItems = [
+    { id: 'intro', label: 'Intro' },
+    { id: 'process', label: 'Slik gjør vi det' },
+    { id: 'forkompostering', label: 'VermiCast' },
+    { id: 'lab-dashboard', label: 'Lab-data' },
+    { id: 'ripples', label: 'Ringvirkninger' },
+    { id: 'sesong', label: 'Året rundt' },
   ];
 
-  const sections = sectionGroups.flatMap((g) => g.items);
+  const sections = navItems;
 
   return (
     <div
@@ -5834,14 +5807,18 @@ function VerminordDoc() {
         .print-only {
           display: none;
         }
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
           .nav-bar {
-            padding-top: 10px !important;
-            padding-bottom: 10px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+            padding: 14px 20px !important;
           }
-          .nav-bar button {
-            padding: 4px 7px !important;
-            font-size: 10px !important;
+          .nav-links {
+            gap: 4px 16px !important;
+          }
+          .nav-links a {
+            font-size: 12px !important;
           }
         }
       `}</style>
@@ -5869,6 +5846,78 @@ function VerminordDoc() {
         <rect width="100%" height="100%" filter="url(#docGrain)" />
       </svg>
 
+      {/* ============ TOP NAV (web only) ============ */}
+      <nav
+        className="nav-bar hide-print"
+        style={{
+          position: 'sticky',
+          top: 0,
+          background: '#1C3A5C',
+          zIndex: 20,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 40px',
+          height: 56,
+        }}
+      >
+        <div
+          style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', flexShrink: 0 }}
+          onClick={() => {
+            setActiveSection('intro');
+            const el = document.getElementById('section-intro');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
+          <svg width="44" height="28" viewBox="0 0 44 28" fill="none" style={{ flexShrink: 0 }}>
+            <path d="M6 16 C8 12, 10 12, 12 14 C14 16, 16 16, 18 14 C20 12, 22 12, 24 14 C26 16, 28 16, 30 14 C32 12, 34 12, 36 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+            <circle cx="38" cy="14" r="3" fill="white" />
+            <path d="M4 16 L1 13 M4 16 L1 19" stroke="white" strokeWidth="2" strokeLinecap="round" />
+            <path d="M10 14 L10 10 M14 16 L14 12 M18 14 L18 10 M22 14 L22 10 M26 16 L26 12 M30 14 L30 10 M34 14 L34 10" stroke="white" strokeWidth="0.8" strokeLinecap="round" opacity="0.4" />
+          </svg>
+          <span
+            style={{
+              color: 'white',
+              fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+              fontSize: 18,
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+            }}
+          >
+            Verminord
+          </span>
+        </div>
+        <div className="nav-links" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 28px', alignItems: 'center' }}>
+          {navItems.map((s) => (
+            <a
+              key={s.id}
+              href={`#section-${s.id}`}
+              onClick={(e) => {
+                e.preventDefault();
+                setActiveSection(s.id);
+                const el = document.getElementById(`section-${s.id}`);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              style={{
+                color: activeSection === s.id ? '#B8993A' : 'rgba(255,255,255,0.85)',
+                fontSize: 13.5,
+                fontWeight: 600,
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                textDecoration: activeSection === s.id ? 'underline' : 'none',
+                textUnderlineOffset: 4,
+                fontFamily: '"Schibsted Grotesk", system-ui, sans-serif',
+                cursor: 'pointer',
+                transition: 'color 0.15s ease',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {s.label}
+            </a>
+          ))}
+        </div>
+      </nav>
+
       <div
         style={{
           maxWidth: 620,
@@ -5878,163 +5927,38 @@ function VerminordDoc() {
           zIndex: 2,
         }}
       >
-        {/* ============ TOP NAV (web only) ============ */}
-        <nav
-          className="nav-bar hide-print"
-          style={{
-            position: 'sticky',
-            top: 0,
-            background: palette.bg,
-            zIndex: 20,
-            paddingTop: 16,
-            paddingBottom: 14,
-            marginBottom: 4,
-            borderBottom: `1px solid ${palette.line}`,
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              marginBottom: 14,
-            }}
-          >
-            <div
-              style={{
-                fontFamily: '"Fraunces", serif',
-                fontSize: 20,
-                fontWeight: 500,
-                color: palette.ink,
-                letterSpacing: '-0.015em',
-              }}
-            >
-              Verminord
-            </div>
-            <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: palette.muted, fontWeight: 500 }}>
-              Interaktiv guide
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 0, flexWrap: 'wrap', alignItems: 'center' }}>
-            {sectionGroups.map((group, gi) => (
-              <React.Fragment key={group.label}>
-                {gi > 0 && (
-                  <div style={{ width: 1, height: 14, background: palette.line, margin: '0 6px', flexShrink: 0 }} />
-                )}
-                {group.items.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => {
-                      setActiveSection(s.id);
-                      const el = document.getElementById(`section-${s.id}`);
-                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }}
-                    style={{
-                      padding: '5px 10px',
-                      background: activeSection === s.id ? palette.ink : 'transparent',
-                      border: 'none',
-                      borderRadius: 3,
-                      fontSize: 11,
-                      color: activeSection === s.id ? palette.bg : palette.inkSoft,
-                      cursor: 'pointer',
-                      fontFamily: 'inherit',
-                      fontWeight: 500,
-                      letterSpacing: '0.02em',
-                      whiteSpace: 'nowrap',
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    {s.label}
-                  </button>
-                ))}
-              </React.Fragment>
-            ))}
-          </div>
-        </nav>
 
-        {/* ============ INTRO / HERO ============ */}
-        <section id="section-intro" className="section-page" style={{ paddingTop: 28, paddingBottom: 40 }}>
-          <div
-            style={{
-              fontSize: 10,
-              letterSpacing: '0.28em',
-              textTransform: 'uppercase',
-              color: palette.warm,
-              fontWeight: 600,
-              marginBottom: 22,
-            }}
-          >
-            Verminord · Interaktiv oversikt
-          </div>
-
+        {/* ============ INTRO / LANDING ============ */}
+        <section id="section-intro" className="section-page" style={{ paddingTop: 64, paddingBottom: 64 }}>
           <h1
             style={{
               fontFamily: '"Fraunces", serif',
-              fontSize: 'clamp(40px, 9vw, 60px)',
-              lineHeight: 1.02,
+              fontSize: 'clamp(48px, 10vw, 72px)',
+              lineHeight: 1.0,
               margin: 0,
               fontWeight: 400,
-              letterSpacing: '-0.025em',
+              letterSpacing: '-0.03em',
               color: palette.ink,
               fontVariationSettings: '"opsz" 144',
             }}
           >
-            Slik lager vi <em style={{ fontStyle: 'italic', color: palette.petrol }}>levende jord</em>.
+            Levende<br />
+            <em style={{ fontStyle: 'italic', color: palette.petrol }}>jord.</em>
           </h1>
 
           <p
             style={{
-              fontSize: 16,
-              lineHeight: 1.6,
+              fontSize: 17,
+              lineHeight: 1.7,
               color: palette.inkSoft,
-              marginTop: 22,
+              marginTop: 32,
               marginBottom: 0,
-              maxWidth: 520,
+              maxWidth: 480,
             }}
           >
-            Et lite anlegg på Klepp Stasjon. Lokale råvarer, dokumenterte resultater og
-            ringvirkninger som strekker seg langt utenfor vår egen drift. Her er hele bildet.
-            {' '}Dette er en interaktiv side — utforsk fritt, trykk på det som fanger oppmerksomheten, og se hva som dukker opp.
+            På denne interaktive nettsiden finner du grafiske oppslag som forklarer hva som er i hver
+            pose, hvordan den lages, og hvorfor det er forskjellig fra annen kompost. Og litt til.
           </p>
-
-          {/* Three-stat hero */}
-          <div
-            style={{
-              marginTop: 36,
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
-              gap: 24,
-              padding: '24px 0',
-              borderTop: `1px solid ${palette.line}`,
-              borderBottom: `1px solid ${palette.line}`,
-            }}
-          >
-            <div>
-              <div style={{ fontFamily: '"Fraunces", serif', fontSize: 44, fontWeight: 400, color: palette.ink, letterSpacing: '-0.035em', lineHeight: 1, fontVariationSettings: '"opsz" 144' }}>
-                5
-              </div>
-              <div style={{ fontSize: 10.5, color: palette.muted, marginTop: 6, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600, lineHeight: 1.4 }}>
-                Trinn fra råvare til pose
-              </div>
-            </div>
-            <div>
-              <div style={{ fontFamily: '"Fraunces", serif', fontSize: 44, fontWeight: 400, color: palette.ink, letterSpacing: '-0.035em', lineHeight: 1, fontVariationSettings: '"opsz" 144' }}>
-                {avgHeadroom}
-                <span style={{ fontSize: 24, color: palette.warm }}>%</span>
-              </div>
-              <div style={{ fontSize: 10.5, color: palette.muted, marginTop: 6, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600, lineHeight: 1.4 }}>
-                Sikkerhetsmargin på tungmetaller
-              </div>
-            </div>
-            <div>
-              <div style={{ fontFamily: '"Fraunces", serif', fontSize: 44, fontWeight: 400, color: palette.ink, letterSpacing: '-0.035em', lineHeight: 1, fontVariationSettings: '"opsz" 144' }}>
-                6
-              </div>
-              <div style={{ fontSize: 10.5, color: palette.muted, marginTop: 6, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600, lineHeight: 1.4 }}>
-                Partnertyper i kretsløpet
-              </div>
-            </div>
-          </div>
         </section>
 
         {/* ============ PROCESS — "SLIK GJØR VI DET" ============ */}
