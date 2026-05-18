@@ -1605,9 +1605,8 @@ const ForkomposteringSection = (() => {
     
 
     const activeStep = steps.find((s) => s.id === active);
-    const W = 1100;
-    const H = 380;
-    const Y = 200;
+    const row1 = steps.slice(0, 3);
+    const row2 = steps.slice(3);
 
     return (
       <div
@@ -1621,7 +1620,7 @@ const ForkomposteringSection = (() => {
         }}
       >
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
-          <header style={{ marginBottom: 12 }}>
+          <header style={{ marginBottom: 32 }}>
             <div
               style={{
                 fontSize: 10.5,
@@ -1659,6 +1658,7 @@ const ForkomposteringSection = (() => {
               style={{
                 fontSize: 16,
                 lineHeight: 1.7,
+                fontWeight: 300,
                 maxWidth: 660,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -1670,178 +1670,177 @@ const ForkomposteringSection = (() => {
             </p>
           </header>
 
-          <div style={{ position: 'relative', marginTop: 8 }}>
-            <svg
-              viewBox={`0 0 ${W} ${H}`}
-              style={{ width: '100%', height: 'auto', display: 'block' }}
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <filter id="grain-fk">
-                  <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
-                  <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.03 0" />
-                </filter>
-                <linearGradient id="heatGrad" x1="0" x2="1" y1="0" y2="0">
-                  <stop offset="0%" stopColor={palette.warm} stopOpacity="0.15" />
-                  <stop offset="50%" stopColor={palette.rust} stopOpacity="0.35" />
-                  <stop offset="100%" stopColor={palette.moss} stopOpacity="0.2" />
-                </linearGradient>
-              </defs>
-
-              {/* connecting path */}
-              <path
-                d={`M ${nodePos(0, steps.length, W, Y)[0]} ${Y} Q ${W / 2} ${Y - 60} ${
-                  nodePos(steps.length - 1, steps.length, W, Y)[0]
-                } ${Y}`}
-                fill="none"
-                stroke={palette.line}
-                strokeWidth="1.4"
-                strokeDasharray="2 6"
-              />
-
-              {/* heat / process indicator bar */}
-              <rect
-                x={nodePos(0, steps.length, W, Y)[0]}
-                y={Y + 80}
-                width={
-                  nodePos(steps.length - 1, steps.length, W, Y)[0] -
-                  nodePos(0, steps.length, W, Y)[0]
-                }
-                height="6"
-                fill="url(#heatGrad)"
-                rx="3"
-              />
-              <text
-                x={nodePos(0, steps.length, W, Y)[0]}
-                y={Y + 108}
-                fill={palette.muted}
-                style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
-              >
-                kald · rå
-              </text>
-              <text
-                x={W / 2}
-                y={Y + 108}
-                textAnchor="middle"
-                fill={palette.rust}
-                style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
-              >
-                termofil · aktiv
-              </text>
-              <text
-                x={nodePos(steps.length - 1, steps.length, W, Y)[0]}
-                y={Y + 108}
-                textAnchor="end"
-                fill={palette.moss}
-                style={{ fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', fontWeight: 600 }}
-              >
-                moden · stabil
-              </text>
-
-              {/* nodes */}
-              {steps.map((s, i) => {
-                const [x, y] = nodePos(i, steps.length, W, Y);
-                const yNode = Y - Math.sin((i / (steps.length - 1)) * Math.PI) * 50;
-                const isActive = active === s.id;
-                const isHover = hovered === s.id;
-                const r = isActive || isHover ? 42 : 38;
-                return (
-                  <g
-                    key={s.id}
-                    onClick={() => setActive(isActive ? null : s.id)}
-                    onMouseEnter={() => setHovered(s.id)}
-                    onMouseLeave={() => setHovered(null)}
-                    style={{
-                      cursor: 'pointer',
-                      opacity: 0,
-                      animation: `nodeIn 0.7s ${0.15 + i * 0.08}s ease-out forwards`,
-                    }}
-                  >
-                    <circle cx={x} cy={yNode} r="50" fill="transparent" />
-                    <circle
-                      cx={x}
-                      cy={yNode}
-                      r={r + 6}
-                      fill="none"
-                      stroke={palette.petrol}
-                      strokeWidth="1"
-                      opacity={isHover && !isActive ? 0.4 : 0}
-                      style={{ transition: 'opacity 0.25s' }}
-                    />
-                    <circle
-                      cx={x}
-                      cy={yNode}
-                      r={r}
-                      fill={isActive ? palette.petrol : palette.paper}
-                      stroke={isActive ? palette.petrol : palette.ink}
-                      strokeWidth={isActive ? 0 : 1.2}
-                      style={{ transition: 'all 0.3s ease' }}
-                    />
-                    <text
-                      x={x}
-                      y={yNode + 4}
-                      textAnchor="middle"
-                      fill={isActive ? palette.bg : palette.ink}
-                      style={{
-                        fontFamily: '"IBM Plex Sans", sans-serif',
-                        fontSize: 16,
-                        fontWeight: 500,
-                        pointerEvents: 'none',
-                        transition: 'fill 0.3s',
-                      }}
-                    >
-                      {s.n}
-                    </text>
-                    <text
-                      x={x}
-                      y={yNode + 60}
-                      textAnchor="middle"
-                      fill={palette.ink}
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        pointerEvents: 'none',
-                        letterSpacing: '0.01em',
-                      }}
-                    >
-                      {s.label}
-                    </text>
-                    <text
-                      x={x}
-                      y={yNode + 76}
-                      textAnchor="middle"
-                      fill={palette.muted}
-                      style={{
-                        fontSize: 10.5,
-                        fontStyle: 'italic',
-                        fontFamily: '"IBM Plex Sans", sans-serif',
-                        pointerEvents: 'none',
-                      }}
-                    >
-                      {s.sub}
-                    </text>
-                  </g>
-                );
-              })}
-
-              <rect width={W} height={H} filter="url(#grain-fk)" opacity="0.6" pointerEvents="none" />
-            </svg>
-
-            <style>{`
-              @keyframes nodeIn {
-                from { opacity: 0; transform: scale(0.85); }
-                to { opacity: 1; transform: scale(1); }
-              }
-            `}</style>
+          {/* Row 1: steps 01–03 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 14 }}>
+            {row1.map((s, i) => {
+              const isActive = active === s.id;
+              const isHover = hovered === s.id;
+              return (
+                <div
+                  key={s.id}
+                  onClick={() => setActive(isActive ? null : s.id)}
+                  onMouseEnter={() => setHovered(s.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    background: isActive ? palette.petrol : palette.paper,
+                    border: `1.5px solid ${isActive ? palette.petrol : isHover ? palette.petrol : palette.ink}`,
+                    padding: '22px 20px 18px',
+                    cursor: 'pointer',
+                    transition: 'all 0.25s ease',
+                    transform: isActive || isHover ? 'translateY(-2px)' : 'none',
+                    position: 'relative',
+                  }}
+                >
+                  <div style={{
+                    fontSize: 10,
+                    letterSpacing: '0.2em',
+                    fontWeight: 600,
+                    color: isActive ? 'rgba(255,255,255,0.7)' : palette.muted,
+                    marginBottom: 8,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.n}
+                  </div>
+                  <div style={{
+                    fontFamily: '"IBM Plex Sans", sans-serif',
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: isActive ? '#F1EADC' : palette.ink,
+                    marginBottom: 6,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.label}
+                  </div>
+                  <div style={{
+                    fontSize: 13,
+                    fontStyle: 'italic',
+                    color: isActive ? 'rgba(255,255,255,0.75)' : palette.muted,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.sub}
+                  </div>
+                  {i < row1.length - 1 && (
+                    <div style={{
+                      position: 'absolute',
+                      right: -11,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: palette.line,
+                      fontSize: 16,
+                      fontWeight: 700,
+                      zIndex: 1,
+                    }}>→</div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
+          {/* Arrow connecting rows */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            padding: '2px 0',
+            color: palette.line,
+            fontSize: 16,
+          }}>↓</div>
+
+          {/* Row 2: steps 04–06 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
+            {row2.map((s, i) => {
+              const isActive = active === s.id;
+              const isHover = hovered === s.id;
+              return (
+                <div
+                  key={s.id}
+                  onClick={() => setActive(isActive ? null : s.id)}
+                  onMouseEnter={() => setHovered(s.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    background: isActive ? palette.petrol : palette.paper,
+                    border: `1.5px solid ${isActive ? palette.petrol : isHover ? palette.petrol : palette.ink}`,
+                    padding: '22px 20px 18px',
+                    cursor: 'pointer',
+                    transition: 'all 0.25s ease',
+                    transform: isActive || isHover ? 'translateY(-2px)' : 'none',
+                    position: 'relative',
+                  }}
+                >
+                  <div style={{
+                    fontSize: 10,
+                    letterSpacing: '0.2em',
+                    fontWeight: 600,
+                    color: isActive ? 'rgba(255,255,255,0.7)' : palette.muted,
+                    marginBottom: 8,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.n}
+                  </div>
+                  <div style={{
+                    fontFamily: '"IBM Plex Sans", sans-serif',
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: isActive ? '#F1EADC' : palette.ink,
+                    marginBottom: 6,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.label}
+                  </div>
+                  <div style={{
+                    fontSize: 13,
+                    fontStyle: 'italic',
+                    color: isActive ? 'rgba(255,255,255,0.75)' : palette.muted,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.sub}
+                  </div>
+                  {i < row2.length - 1 && (
+                    <div style={{
+                      position: 'absolute',
+                      right: -11,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: palette.line,
+                      fontSize: 16,
+                      fontWeight: 700,
+                      zIndex: 1,
+                    }}>→</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Heat gradient bar */}
+          <div style={{ marginTop: 20 }}>
+            <div style={{
+              height: 6,
+              borderRadius: 3,
+              background: `linear-gradient(to right, ${palette.warm}26, ${palette.rust}59, ${palette.moss}33)`,
+            }} />
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginTop: 8,
+              fontSize: 10,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              fontWeight: 600,
+            }}>
+              <span style={{ color: palette.muted }}>kald · rå</span>
+              <span style={{ color: palette.rust }}>termofil · aktiv</span>
+              <span style={{ color: palette.moss }}>moden · stabil</span>
+            </div>
+          </div>
+
+          {/* Detail panel */}
           <div
             style={{
-              marginTop: 8,
+              marginTop: 20,
               background: activeStep ? palette.paper : 'transparent',
               border: activeStep ? `1px solid ${palette.line}` : '1px dashed transparent',
-              padding: '28px 30px',
-              minHeight: 180,
+              padding: activeStep ? '28px 30px' : '16px 30px',
+              minHeight: activeStep ? 120 : 0,
               transition: 'background 0.3s ease, border-color 0.3s ease',
             }}
           >
@@ -1865,7 +1864,7 @@ const ForkomposteringSection = (() => {
                     fontSize: 26,
                     lineHeight: 1.2,
                     margin: 0,
-                    fontWeight: 500,
+                    fontWeight: 600,
                     color: palette.ink,
                     letterSpacing: '-0.01em',
                   }}
@@ -1893,7 +1892,7 @@ const ForkomposteringSection = (() => {
                     >
                       Hva skjer
                     </div>
-                    <p style={{ fontSize: 14.5, lineHeight: 1.6, margin: 0, color: '#3A3631' }}>{activeStep.hva}</p>
+                    <p style={{ fontSize: 15, lineHeight: 1.65, margin: 0, color: '#3A3631' }}>{activeStep.hva}</p>
                   </div>
                   <div>
                     <div
@@ -1908,7 +1907,7 @@ const ForkomposteringSection = (() => {
                     >
                       Hva kontrolleres
                     </div>
-                    <p style={{ fontSize: 14.5, lineHeight: 1.6, margin: 0, color: '#3A3631' }}>{activeStep.kontroll}</p>
+                    <p style={{ fontSize: 15, lineHeight: 1.65, margin: 0, color: '#3A3631' }}>{activeStep.kontroll}</p>
                   </div>
                   <div>
                     <div
@@ -1923,7 +1922,7 @@ const ForkomposteringSection = (() => {
                     >
                       Ved avvik
                     </div>
-                    <p style={{ fontSize: 14.5, lineHeight: 1.6, margin: 0, color: '#3A3631' }}>{activeStep.avvik}</p>
+                    <p style={{ fontSize: 15, lineHeight: 1.65, margin: 0, color: '#3A3631' }}>{activeStep.avvik}</p>
                   </div>
                 </div>
               </div>
@@ -1931,14 +1930,14 @@ const ForkomposteringSection = (() => {
               <div
                 style={{
                   color: palette.muted,
-                  fontSize: 13.5,
+                  fontSize: 14,
                   textAlign: 'center',
                   fontStyle: 'italic',
                   fontFamily: '"IBM Plex Sans", sans-serif',
-                  paddingTop: 40,
+                  paddingTop: 8,
                 }}
               >
-                Trykk på et steg over for å se hva som skjer i praksis.
+                Trykk på et steg for å se hva som skjer i praksis.
               </div>
             )}
           </div>
