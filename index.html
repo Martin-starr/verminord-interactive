@@ -6410,5 +6410,38 @@ setTimeout(() => {
   }
 }, 300);
 </script>
+<script>
+/* Auto-resize support: when this page is embedded in an iframe (e.g. Wix),
+   broadcast its full content height to the parent so the frame can grow
+   instead of scrolling internally. No-op when opened directly. */
+(function () {
+  if (window.self === window.top) return;
+  var lastH = 0;
+  function postHeight() {
+    var h = Math.max(
+      document.documentElement.scrollHeight,
+      document.body ? document.body.scrollHeight : 0
+    );
+    if (h && h !== lastH) {
+      lastH = h;
+      try {
+        window.parent.postMessage({ type: 'verminord:height', height: h }, '*');
+      } catch (e) {}
+    }
+  }
+  window.addEventListener('load', postHeight);
+  window.addEventListener('resize', postHeight);
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(postHeight).observe(document.documentElement);
+  }
+  // viz detail panels expand/collapse on click — re-measure after the transition
+  document.addEventListener('click', function () { setTimeout(postHeight, 350); }, true);
+  var n = 0, iv = setInterval(function () {
+    postHeight();
+    if (++n > 20) clearInterval(iv);
+  }, 500);
+  postHeight();
+})();
+</script>
 </body>
 </html>
