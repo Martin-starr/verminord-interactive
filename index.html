@@ -1298,8 +1298,6 @@ const RaavarerSection = (() => {
                     cursor: 'pointer',
                     transition: 'all 0.25s ease',
                     transform: isActive || isHover ? 'translateY(-3px)' : 'none',
-                    opacity: 0,
-                    animation: `fadeUp 0.6s ${0.1 + i * 0.08}s ease-out forwards`,
                   }}
                 >
                   <div
@@ -3276,16 +3274,9 @@ const ProduksjonSection = (() => {
     
 
     const activeStage = stages.find((s) => s.id === active);
-
-    const W = 1200;
-    const H = 520;
-    const Y = 280;
-    const stageW = 130;
-    const stageH = 90;
     const total = stages.length;
-    const startX = 80;
-    const endX = W - 80;
-    const stepX = (endX - startX - stageW) / (total - 1);
+    const row1 = stages.slice(0, 4);
+    const row2 = stages.slice(4);
 
     return (
       <div
@@ -3299,7 +3290,7 @@ const ProduksjonSection = (() => {
         }}
       >
         <div style={{ maxWidth: 1220, margin: '0 auto' }}>
-          <header style={{ marginBottom: 12 }}>
+          <header style={{ marginBottom: 32 }}>
             <div
               style={{
                 fontSize: 10.5,
@@ -3337,6 +3328,7 @@ const ProduksjonSection = (() => {
               style={{
                 fontSize: 16,
                 lineHeight: 1.7,
+                fontWeight: 300,
                 maxWidth: 680,
                 margin: '22px 0 0 0',
                 color: '#3A3631',
@@ -3347,221 +3339,175 @@ const ProduksjonSection = (() => {
             </p>
           </header>
 
-          <div style={{ position: 'relative', marginTop: 8 }}>
-            <svg
-              viewBox={`0 0 ${W} ${H}`}
-              style={{ width: '100%', height: 'auto', display: 'block' }}
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <filter id="grain-pr">
-                  <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
-                  <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.03 0" />
-                </filter>
-                <marker
-                  id="arrow"
-                  viewBox="0 0 10 10"
-                  refX="8"
-                  refY="5"
-                  markerWidth="6"
-                  markerHeight="6"
-                  orient="auto"
+          {/* Row 1: stages 01–04 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 12 }}>
+            {row1.map((s, i) => {
+              const isActive = active === s.id;
+              const isHover = hovered === s.id;
+              return (
+                <div
+                  key={s.id}
+                  onClick={() => setActive(isActive ? null : s.id)}
+                  onMouseEnter={() => setHovered(s.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    background: isActive ? s.color : palette.paper,
+                    border: `1.5px solid ${isActive ? s.color : isHover ? s.color : palette.ink}`,
+                    padding: '20px 18px 18px',
+                    cursor: 'pointer',
+                    transition: 'all 0.25s ease',
+                    transform: isActive || isHover ? 'translateY(-2px)' : 'none',
+                    position: 'relative',
+                  }}
                 >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill={palette.line} />
-                </marker>
-              </defs>
+                  <div style={{
+                    fontSize: 10,
+                    letterSpacing: '0.2em',
+                    fontWeight: 600,
+                    color: isActive ? 'rgba(255,255,255,0.7)' : palette.muted,
+                    marginBottom: 8,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.n}
+                  </div>
+                  <div style={{
+                    fontFamily: '"IBM Plex Sans", sans-serif',
+                    fontSize: 20,
+                    fontWeight: 600,
+                    color: isActive ? palette.bg : palette.ink,
+                    marginBottom: 6,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.label}
+                  </div>
+                  <div style={{
+                    fontSize: 12,
+                    fontStyle: 'italic',
+                    color: isActive ? 'rgba(255,255,255,0.8)' : palette.muted,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.duration}
+                  </div>
+                  {i < row1.length - 1 && (
+                    <div style={{
+                      position: 'absolute',
+                      right: -9,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: palette.line,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      zIndex: 1,
+                    }}>→</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
-              {/* Input feeders coming down into stage 1 */}
-              {inputs.map((inp, i) => {
-                const xStart = startX + 15 + i * 25;
-                const yStart = 60;
-                const xEnd = startX + stageW / 2;
-                const yEnd = Y;
-                return (
-                  <g key={inp} style={{ opacity: 0, animation: `fadeIn 0.8s ${i * 0.1}s ease-out forwards` }}>
-                    <text
-                      x={xStart}
-                      y={yStart - 8}
-                      textAnchor="middle"
-                      fill={palette.muted}
-                      style={{
-                        fontSize: 9.5,
-                        fontStyle: 'italic',
-                        fontFamily: '"IBM Plex Sans", sans-serif',
-                      }}
-                      transform={`rotate(-35, ${xStart}, ${yStart - 8})`}
-                    >
-                      {inp}
-                    </text>
-                    <path
-                      d={`M ${xStart} ${yStart} Q ${xStart} ${(yStart + yEnd) / 2} ${xEnd} ${yEnd}`}
-                      fill="none"
-                      stroke={palette.line}
-                      strokeWidth="0.8"
-                      strokeDasharray="2 4"
-                    />
-                    <circle cx={xStart} cy={yStart} r="2.5" fill={palette.warm} />
-                  </g>
-                );
-              })}
+          {/* Arrow connecting rows */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            padding: '4px 0',
+            color: palette.line,
+            fontSize: 16,
+          }}>↓</div>
 
-              {/* Main flow line */}
-              <line
-                x1={startX + stageW}
-                y1={Y + stageH / 2}
-                x2={endX - stageW + stageW}
-                y2={Y + stageH / 2}
-                stroke={palette.line}
-                strokeWidth="1"
-                strokeDasharray="3 4"
-              />
+          {/* Row 2: stages 05–07 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, maxWidth: '75%', margin: '0 auto' }}>
+            {row2.map((s, i) => {
+              const isActive = active === s.id;
+              const isHover = hovered === s.id;
+              return (
+                <div
+                  key={s.id}
+                  onClick={() => setActive(isActive ? null : s.id)}
+                  onMouseEnter={() => setHovered(s.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  style={{
+                    background: isActive ? s.color : palette.paper,
+                    border: `1.5px solid ${isActive ? s.color : isHover ? s.color : palette.ink}`,
+                    padding: '20px 18px 18px',
+                    cursor: 'pointer',
+                    transition: 'all 0.25s ease',
+                    transform: isActive || isHover ? 'translateY(-2px)' : 'none',
+                    position: 'relative',
+                  }}
+                >
+                  <div style={{
+                    fontSize: 10,
+                    letterSpacing: '0.2em',
+                    fontWeight: 600,
+                    color: isActive ? 'rgba(255,255,255,0.7)' : palette.muted,
+                    marginBottom: 8,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.n}
+                  </div>
+                  <div style={{
+                    fontFamily: '"IBM Plex Sans", sans-serif',
+                    fontSize: 20,
+                    fontWeight: 600,
+                    color: isActive ? palette.bg : palette.ink,
+                    marginBottom: 6,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.label}
+                  </div>
+                  <div style={{
+                    fontSize: 12,
+                    fontStyle: 'italic',
+                    color: isActive ? 'rgba(255,255,255,0.8)' : palette.muted,
+                    transition: 'color 0.25s',
+                  }}>
+                    {s.duration}
+                  </div>
+                  {i < row2.length - 1 && (
+                    <div style={{
+                      position: 'absolute',
+                      right: -9,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: palette.line,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      zIndex: 1,
+                    }}>→</div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
-              {/* Stage boxes */}
-              {stages.map((s, i) => {
-                const x = startX + i * stepX;
-                const isActive = active === s.id;
-                const isHover = hovered === s.id;
-                return (
-                  <g
-                    key={s.id}
-                    onClick={() => setActive(isActive ? null : s.id)}
-                    onMouseEnter={() => setHovered(s.id)}
-                    onMouseLeave={() => setHovered(null)}
-                    style={{
-                      cursor: 'pointer',
-                      opacity: 0,
-                      animation: `fadeIn 0.7s ${0.3 + i * 0.07}s ease-out forwards`,
-                    }}
-                  >
-                    {/* hover halo */}
-                    <rect
-                      x={x - 4}
-                      y={Y - 4}
-                      width={stageW + 8}
-                      height={stageH + 8}
-                      fill="none"
-                      stroke={s.color}
-                      strokeWidth="1"
-                      opacity={isHover && !isActive ? 0.35 : 0}
-                      style={{ transition: 'opacity 0.25s' }}
-                    />
-                    <rect
-                      x={x}
-                      y={Y}
-                      width={stageW}
-                      height={stageH}
-                      fill={isActive ? s.color : palette.paper}
-                      stroke={isActive ? s.color : palette.ink}
-                      strokeWidth={isActive ? 0 : 1}
-                      style={{ transition: 'all 0.3s ease' }}
-                    />
-                    {/* step number top-left */}
-                    <text
-                      x={x + 10}
-                      y={Y + 18}
-                      fill={isActive ? palette.bg : palette.muted}
-                      style={{
-                        fontSize: 9.5,
-                        letterSpacing: '0.18em',
-                        fontWeight: 600,
-                        transition: 'fill 0.3s',
-                        pointerEvents: 'none',
-                      }}
-                    >
-                      {s.n}
-                    </text>
-                    {/* label centered */}
-                    <text
-                      x={x + stageW / 2}
-                      y={Y + stageH / 2 + 4}
-                      textAnchor="middle"
-                      fill={isActive ? palette.bg : palette.ink}
-                      style={{
-                        fontFamily: '"IBM Plex Sans", sans-serif',
-                        fontSize: 17,
-                        fontWeight: 500,
-                        transition: 'fill 0.3s',
-                        pointerEvents: 'none',
-                      }}
-                    >
-                      {s.label}
-                    </text>
-                    {/* duration bottom */}
-                    <text
-                      x={x + stageW / 2}
-                      y={Y + stageH - 12}
-                      textAnchor="middle"
-                      fill={isActive ? palette.bg : palette.muted}
-                      opacity={isActive ? 0.85 : 1}
-                      style={{
-                        fontSize: 10,
-                        letterSpacing: '0.1em',
-                        transition: 'fill 0.3s',
-                        pointerEvents: 'none',
-                        fontStyle: 'italic',
-                      }}
-                    >
-                      {s.duration}
-                    </text>
-
-                    {/* connector arrow */}
-                    {i < total - 1 && (
-                      <line
-                        x1={x + stageW + 2}
-                        y1={Y + stageH / 2}
-                        x2={x + stepX - 2}
-                        y2={Y + stageH / 2}
-                        stroke={palette.line}
-                        strokeWidth="1.2"
-                        markerEnd="url(#arrow)"
-                      />
-                    )}
-                  </g>
-                );
-              })}
-
-              {/* Bottom annotation: traceability */}
-              <line
-                x1={startX}
-                y1={Y + stageH + 50}
-                x2={endX}
-                y2={Y + stageH + 50}
-                stroke={palette.petrol}
-                strokeWidth="0.6"
-                opacity="0.5"
-              />
-              <text
-                x={startX}
-                y={Y + stageH + 70}
-                fill={palette.petrol}
-                style={{
-                  fontSize: 10,
-                  letterSpacing: '0.22em',
-                  textTransform: 'uppercase',
-                  fontWeight: 600,
-                }}
-              >
-                ← Sporbarhet: Batch-ID følger materialet gjennom hele kjeden →
-              </text>
-
-              <rect width={W} height={H} filter="url(#grain-pr)" opacity="0.6" pointerEvents="none" />
-            </svg>
-
-            <style>{`
-              @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(6px); }
-                to { opacity: 1; transform: translateY(0); }
-              }
-            `}</style>
+          {/* Traceability annotation */}
+          <div style={{
+            marginTop: 24,
+            paddingTop: 16,
+            borderTop: `1px solid ${palette.petrol}30`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+          }}>
+            <div style={{
+              fontSize: 10,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              fontWeight: 600,
+              color: palette.petrol,
+              opacity: 0.7,
+            }}>
+              ← Sporbarhet: Batch-ID følger materialet gjennom hele kjeden →
+            </div>
           </div>
 
           <div
             style={{
-              marginTop: 8,
+              marginTop: 20,
               background: activeStage ? palette.paper : 'transparent',
               border: activeStage ? `1px solid ${palette.line}` : '1px dashed transparent',
-              padding: '28px 30px',
-              minHeight: 170,
+              padding: activeStage ? '28px 30px' : '16px 30px',
+              minHeight: activeStage ? 120 : 0,
               transition: 'background 0.3s ease, border-color 0.3s ease',
             }}
           >
@@ -5811,6 +5757,10 @@ function VerminordDoc() {
           .nav-links a {
             font-size: 12px !important;
           }
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
 
