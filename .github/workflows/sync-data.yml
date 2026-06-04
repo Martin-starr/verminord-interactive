@@ -1,0 +1,40 @@
+name: Sync Google Sheet → data.json
+
+on:
+  schedule:
+    - cron: "0 5 * * *"   # 05:00 UTC = 06:00 norsk sommertid, 07:00 vintertid
+  workflow_dispatch:       # manuell kjøring fra GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: Run sync
+        env:
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
+        run: python scripts/sync_sheet.py
+
+      - name: Commit & push data.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          if git diff --cached --quiet; then
+            echo "Ingen endringer i data.json"
+          else
+            git commit -m "chore: oppdater data.json fra Google Sheet ($(date -u +%Y-%m-%d))"
+            git push
+          fi
