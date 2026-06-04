@@ -15,10 +15,10 @@
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
-var PRODUCTION_TAB = "Worm Production";
-var PRECOMPOST_TAB = "Pre-Compost";
+var PRODUCTION_TAB = "Produksjon";
+var PRECOMPOST_TAB = "Forkompost";
 
-var COL = { DATE:0, BIN:1, FEED:2, ADDED:3, MOISTURE:4, TEMP:5, PH:6, COMMENT:7, SOURCE:8 };
+var COL = { TIMESTAMP:0, SYSTEM:1, LOGGER:2, TEMP:3, PH:4, MOISTURE:5, FEED:6, COMMENT:7 };
 
 var RANGES = [
   {key:"7D",label:"7 DGR",n:7},{key:"21D",label:"21 DGR",n:21},
@@ -27,33 +27,33 @@ var RANGES = [
 ];
 
 var SYSTEMS = [
-  {id:"cft1",name:"CFT1",group:"prod",targets:{temp:[15,25],fukt:[60,80],ph:[6.0,8.0]}},
-  {id:"cft2",name:"CFT2",group:"prod",targets:{temp:[15,25],fukt:[60,80],ph:[6.0,8.0]}},
-  {id:"cft3",name:"CFT3",group:"prod",targets:{temp:[15,25],fukt:[60,80],ph:[6.0,8.0]}},
-  {id:"wedge1",name:"Wedge 1",group:"prod",targets:{temp:[15,25],fukt:[60,80],ph:[6.0,8.0]}},
-  {id:"wedge2",name:"Wedge 2",group:"prod",targets:{temp:[15,25],fukt:[60,80],ph:[6.0,8.0]}},
-  {id:"breeder",name:"Breeder",group:"prod",targets:{temp:[15,25],fukt:[60,80],ph:[6.0,8.0]}},
+  {id:"cft1",name:"CFT1",group:"prod",targets:{temp:[15,25],fukt:[60,85],ph:[6.0,8.0]}},
+  {id:"cft2",name:"CFT2",group:"prod",targets:{temp:[15,25],fukt:[60,85],ph:[6.0,8.0]}},
+  {id:"cft3",name:"CFT3",group:"prod",targets:{temp:[15,25],fukt:[60,85],ph:[6.0,8.0]}},
+  {id:"wedge1",name:"Wedge 1",group:"prod",targets:{temp:[15,25],fukt:[60,85],ph:[6.0,8.0]}},
+  {id:"wedge2",name:"Wedge 2",group:"prod",targets:{temp:[15,25],fukt:[60,85],ph:[6.0,8.0]}},
+  {id:"breeder",name:"Breeder Bin",group:"prod",targets:{temp:[15,25],fukt:[60,85],ph:[6.0,8.0]}},
   {id:"forkompost1",name:"Forkompost 1",group:"precompost",targets:{temp:[55,80],fukt:[50,70],ph:[6.0,8.5]},threshold:55,required:5},
-  {id:"forkompost2",name:"Forkompost 2",group:"precompost",targets:{temp:[55,80],fukt:[50,70],ph:[6.0,8.5]},threshold:55,required:5}
+  {id:"forkompost2",name:"Forkompost 2",group:"precompost",targets:{temp:[55,80],fukt:[50,70],ph:[6.0,8.5]},threshold:55,required:5},
+  {id:"forkompost3",name:"Forkompost 3",group:"precompost",targets:{temp:[55,80],fukt:[50,70],ph:[6.0,8.5]},threshold:55,required:5}
 ];
 
-// Epoch map: {start, end (null=ongoing), tab, bin} → system
-var EPOCH_MAP = [
-  {start:"2025-07-01",end:"2025-10-31",tab:"production",bin:1,system:"wedge1"},
-  {start:"2025-07-01",end:"2025-10-31",tab:"production",bin:2,system:"wedge2"},
-  {start:"2025-11-01",end:"2026-01-31",tab:"production",bin:1,system:"cft1"},
-  {start:"2025-11-01",end:"2026-01-31",tab:"production",bin:2,system:"cft2"},
-  {start:"2025-11-01",end:"2026-01-31",tab:"production",bin:3,system:"cft3"},
-  {start:"2025-11-01",end:"2026-01-31",tab:"production",bin:4,system:"wedge1"},
-  {start:"2026-02-01",end:null,tab:"production",bin:1,system:"cft1"},
-  {start:"2026-02-01",end:null,tab:"production",bin:2,system:"cft2"},
-  {start:"2026-02-01",end:null,tab:"production",bin:3,system:"cft3"},
-  {start:"2026-02-01",end:null,tab:"production",bin:4,system:"wedge1"},
-  {start:"2026-02-01",end:null,tab:"production",bin:5,system:"wedge2"},
-  {start:"2026-02-01",end:null,tab:"production",bin:6,system:"breeder"},
-  {start:"2025-07-01",end:null,tab:"precompost",bin:1,system:"forkompost1"},
-  {start:"2025-07-01",end:null,tab:"precompost",bin:2,system:"forkompost2"}
-];
+// Name → system-id map (case-insensitive, with aliases)
+var NAME_MAP = (function(){
+  var m = {};
+  SYSTEMS.forEach(function(s){
+    m[s.name.toLowerCase()] = s.id;
+    m[s.id.toLowerCase()] = s.id;
+  });
+  // Common aliases
+  m["bb"]  = "breeder";
+  m["w1"]  = "wedge1";
+  m["w2"]  = "wedge2";
+  m["fk1"] = "forkompost1";
+  m["fk2"] = "forkompost2";
+  m["fk3"] = "forkompost3";
+  return m;
+})();
 
 // ── Entry point ─────────────────────────────────────────────────────────────
 
@@ -67,7 +67,8 @@ function syncToGitHub() {
   var prodRecs = parseRows_(prodRows);
   var preRecs  = parseRows_(preRows);
 
-  var data = buildDataJson_(prodRecs, preRecs, today);
+  var allRecs = prodRecs.concat(preRecs);
+  var data = buildDataJson_(allRecs, today);
   var json = JSON.stringify(data, null, 2);
 
   pushToGitHub_(json);
@@ -86,14 +87,14 @@ function parseRows_(rows) {
   var records = [];
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
-    var d = parseDate_(row[COL.DATE]);
+    var d = parseDate_(row[COL.TIMESTAMP]);
     if (!d) continue;
-    var bin = parseInt(row[COL.BIN], 10);
-    if (isNaN(bin)) continue;
+    var systemName = String(row[COL.SYSTEM] || "").trim();
+    if (!systemName) continue;
 
     records.push({
       date: d,
-      bin: bin,
+      systemName: systemName,
       temp: parseNum_(row[COL.TEMP]),
       moisture: parseNum_(row[COL.MOISTURE]),
       ph: parseNum_(row[COL.PH]),
@@ -118,31 +119,20 @@ function parseNum_(v) {
   return isNaN(n) ? null : n;
 }
 
-// ── Epoch → System ──────────────────────────────────────────────────────────
+// ── Name → System ───────────────────────────────────────────────────────────
 
-function resolveSystem_(d, bin, tabKey) {
-  for (var i = 0; i < EPOCH_MAP.length; i++) {
-    var ep = EPOCH_MAP[i];
-    if (ep.tab !== tabKey || ep.bin !== bin) continue;
-    var start = new Date(ep.start);
-    var end = ep.end ? new Date(ep.end) : new Date(2099, 11, 31);
-    if (d >= start && d <= end) return ep.system;
-  }
-  return null;
+function resolveSystemByName_(name) {
+  return NAME_MAP[name.toLowerCase().trim()] || null;
 }
 
 // ── Build data.json ─────────────────────────────────────────────────────────
 
-function buildDataJson_(prodRecs, preRecs, today) {
+function buildDataJson_(allRecs, today) {
   var bySystem = {};
   SYSTEMS.forEach(function(s){ bySystem[s.id] = []; });
 
-  prodRecs.forEach(function(r){
-    var sid = resolveSystem_(r.date, r.bin, "production");
-    if (sid && bySystem[sid]) bySystem[sid].push(r);
-  });
-  preRecs.forEach(function(r){
-    var sid = resolveSystem_(r.date, r.bin, "precompost");
+  allRecs.forEach(function(r){
+    var sid = resolveSystemByName_(r.systemName);
     if (sid && bySystem[sid]) bySystem[sid].push(r);
   });
 
