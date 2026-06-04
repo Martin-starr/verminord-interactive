@@ -83,18 +83,29 @@ function $(sel, el){ return (el||document).querySelector(sel) }
 function $$(sel, el){ return Array.from((el||document).querySelectorAll(sel)) }
 
 function loadData(){
-  fetch('data.json?t='+Date.now())
+  var urls = [
+    'data.json?t='+Date.now(),
+    'https://raw.githubusercontent.com/Martin-starr/verminord-interactive/master/data.json'
+  ];
+  tryFetch(urls, 0);
+}
+
+function tryFetch(urls, i){
+  if(i >= urls.length){
+    if(VN) render();
+    else $('#app').innerHTML = '<div class="no-data" style="margin:auto">Kunne ikke laste data. Pr&oslash;ver igjen om 5 min.</div>';
+    return;
+  }
+  fetch(urls[i])
     .then(function(r){ if(!r.ok) throw r; return r.json() })
     .then(function(d){
       if(d && d.SYSTEMS && d.SYSTEMS.length){
         VN = d;
         window.VN = d;
         render();
-      }
+      } else { tryFetch(urls, i+1); }
     })
-    .catch(function(){
-      if(VN) render();
-    });
+    .catch(function(){ tryFetch(urls, i+1); });
 }
 
 function inRange(val, targets){
