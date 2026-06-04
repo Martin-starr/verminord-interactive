@@ -76,9 +76,13 @@ def fetch_tab(service, sheet_id, tab_name):
 # ---------------------------------------------------------------------------
 
 def parse_date(s):
-    """Parse dd/mm/yyyy or yyyy-mm-dd."""
+    """Parse dd/mm/yyyy, yyyy-mm-dd, dd.mm.yyyy, or timestamp with time."""
     s = s.strip()
-    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%m/%d/%Y"):
+    if " " in s:
+        s = s.split(" ")[0]
+    if "T" in s:
+        s = s.split("T")[0]
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%m/%d/%Y", "%d.%m.%Y"):
         try:
             return datetime.strptime(s, fmt).date()
         except ValueError:
@@ -104,41 +108,50 @@ def is_section_header(row):
     return (
         not first
         or first.startswith("DATE")
+        or first.startswith("TIMESTAMP")
         or "PRODUCTION" in first
         or "COMPOST" in first
         or first.startswith("BIN")
+        or first.startswith("SYSTEM")
         or first.startswith("---")
     )
 
 
 def parse_rows(raw_rows, col_map):
     """Parse sheet rows into structured records."""
+    date_col = col_map.get("timestamp", col_map.get("date", 0))
+    system_col = col_map.get("system", col_map.get("bin", 1))
+    temp_col = col_map["temp"]
+    ph_col = col_map["ph"]
+    moist_col = col_map["moisture"]
+    feed_col = col_map.get("feed", 6)
+    comment_col = col_map.get("comment", 7)
+    max_col = max(col_map.values())
+
     records = []
     for row in raw_rows:
-        if len(row) <= max(col_map.values()):
-            row += [""] * (max(col_map.values()) + 1 - len(row))
+        if len(row) <= max_col:
+            row += [""] * (max_col + 1 - len(row))
 
         if is_section_header(row):
             continue
 
-        d = parse_date(str(row[col_map["date"]]))
+        d = parse_date(str(row[date_col]))
         if d is None:
             continue
 
-        bin_val = str(row[col_map["bin"]]).strip()
-        try:
-            bin_num = int(float(bin_val))
-        except (ValueError, TypeError):
+        system_val = str(row[system_col]).strip()
+        if not system_val:
             continue
 
         records.append({
             "date": d,
-            "bin": bin_num,
-            "temp": parse_float(str(row[col_map["temp"]])),
-            "moisture": parse_float(str(row[col_map["moisture"]])),
-            "ph": parse_float(str(row[col_map["ph"]])),
-            "feed": str(row[col_map["feed"]]).strip() if col_map["feed"] < len(row) else "",
-            "comment": str(row[col_map["comment"]]).strip() if col_map["comment"] < len(row) else "",
+            "system_name": system_val,
+            "temp": parse_float(str(row[temp_col])),
+            "moisture": parse_float(str(row[moist_col])),
+            "ph": parse_float(str(row[ph_col])),
+            "feed": str(row[feed_col]).strip() if feed_col < len(row) else "",
+            "comment": str(row[comment_col]).strip() if comment_col < len(row) else "",
         })
 
     return records
@@ -148,20 +161,24 @@ def parse_rows(raw_rows, col_map):
 # Epoch → System mapping
 # ---------------------------------------------------------------------------
 
-def resolve_system(record_date, bin_num, tab_key, epoch_map):
-    """Find the system ID for a given date + bin + tab using the epoch map."""
-    for ep in epoch_map:
-        if ep["tab"] != tab_key:
-            continue
-        if ep["bin"] != bin_num:
-            continue
+def build_system_name_map(systems_cfg):
+    """Build a case-insensitive name → id map including common aliases."""
+    name_map = {}
+    for s in systems_cfg:
+        name_map[s["name"].lower()] = s["id"]
+        name_map[s["id"].lower()] = s["id"]
+    name_map["bb"] = "breeder"
+    name_map["w1"] = "wedge1"
+    name_map["w2"] = "wedge2"
+    name_map["fk1"] = "forkompost1"
+    name_map["fk2"] = "forkompost2"
+    name_map["fk3"] = "forkompost3"
+    return name_map
 
-        start = date.fromisoformat(ep["start"])
-        end = date.fromisoformat(ep["end"]) if ep.get("end") else date(2099, 12, 31)
 
-        if start <= record_date <= end:
-            return ep["system"]
-    return None
+def resolve_system_by_name(name, name_map):
+    """Resolve a system name string to a system ID."""
+    return name_map.get(name.lower().strip())
 
 
 # ---------------------------------------------------------------------------
@@ -280,21 +297,16 @@ def fmt_updated(d):
 # Main build
 # ---------------------------------------------------------------------------
 
-def build_data_json(prod_records, precomp_records, config, today):
+def build_data_json(all_records, config, today):
     systems_cfg = {s["id"]: s for s in config["systems"]}
-    epoch_map = config["epoch_map"]
     ranges_cfg = config["ranges"]
+    name_map = build_system_name_map(config["systems"])
 
     # Group records by system
     by_system = {s["id"]: [] for s in config["systems"]}
 
-    for rec in prod_records:
-        sid = resolve_system(rec["date"], rec["bin"], "production", epoch_map)
-        if sid and sid in by_system:
-            by_system[sid].append(rec)
-
-    for rec in precomp_records:
-        sid = resolve_system(rec["date"], rec["bin"], "precompost", epoch_map)
+    for rec in all_records:
+        sid = resolve_system_by_name(rec["system_name"], name_map)
         if sid and sid in by_system:
             by_system[sid].append(rec)
 
@@ -484,7 +496,7 @@ def main():
     precomp_records = parse_rows(precomp_rows, col_map)
     print(f"  Parsed: {len(prod_records)} produksjon, {len(precomp_records)} forkompost")
 
-    data = build_data_json(prod_records, precomp_records, config, today)
+    data = build_data_json(prod_records + precomp_records, config, today)
 
     output = Path(os.environ.get("VN_OUTPUT", REPO_ROOT / "data.json"))
     with open(output, "w", encoding="utf-8") as f:
