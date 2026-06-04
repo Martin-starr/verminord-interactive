@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
+      - name: Pre-flight validation
+        run: python scripts/test_sync.py
+
       - name: Run sync
         env:
           GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
