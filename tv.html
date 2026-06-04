@@ -259,10 +259,11 @@ function getWeek(d){
   return Math.ceil(((d-t)/86400000+t.getDay()+1)/7);
 }
 
-loadData();
+if(VN) render();
+updateClock();
+setTimeout(loadData, 3000);
 setInterval(loadData, 5*60*1000);
 setInterval(updateClock, 1000);
-setTimeout(updateClock, 50);
 
 })();
 </script>
