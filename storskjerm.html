@@ -154,7 +154,8 @@ function sparkline(canvas, data, color){
   ctx.lineTo(w-pad, h-pad);
   ctx.lineTo(pad, h-pad);
   ctx.closePath();
-  ctx.fillStyle = (color||'rgba(79,195,247,')').replace(/[\d.]+\)$/,'.08)');
+  var _c = color||'rgba(79,195,247,.7)';
+  ctx.fillStyle = _c.replace(/[\d.]+\)$/,'.08)');
   ctx.fill();
 }
 
