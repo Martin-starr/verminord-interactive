@@ -1,21 +1,20 @@
 {
-  "sheet_id": "FILL_IN_YOUR_GOOGLE_SHEET_ID",
+  "sheet_id": "1l6buGufQJSfziF1sXq5T4yUcjmSBLs-_aKy61Q6xNOw",
 
   "tabs": {
-    "production": "Worm Production",
-    "precompost": "Pre-Compost"
+    "production": "Produksjon",
+    "precompost": "Forkompost"
   },
 
   "columns": {
-    "date": 0,
-    "bin": 1,
-    "feed": 2,
-    "added": 3,
-    "moisture": 4,
-    "temp": 5,
-    "ph": 6,
-    "comment": 7,
-    "source": 8
+    "timestamp": 0,
+    "system": 1,
+    "logger": 2,
+    "temp": 3,
+    "ph": 4,
+    "moisture": 5,
+    "feed": 6,
+    "comment": 7
   },
 
   "ranges": [
@@ -28,14 +27,15 @@
   ],
 
   "systems": [
-    {"id": "cft1",         "name": "CFT1",          "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 80], "ph": [6.0, 8.0]}},
-    {"id": "cft2",         "name": "CFT2",          "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 80], "ph": [6.0, 8.0]}},
-    {"id": "cft3",         "name": "CFT3",          "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 80], "ph": [6.0, 8.0]}},
-    {"id": "wedge1",       "name": "Wedge 1",       "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 80], "ph": [6.0, 8.0]}},
-    {"id": "wedge2",       "name": "Wedge 2",       "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 80], "ph": [6.0, 8.0]}},
-    {"id": "breeder",      "name": "Breeder",       "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 80], "ph": [6.0, 8.0]}},
+    {"id": "cft1",         "name": "CFT1",          "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 85], "ph": [6.0, 8.0]}},
+    {"id": "cft2",         "name": "CFT2",          "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 85], "ph": [6.0, 8.0]}},
+    {"id": "cft3",         "name": "CFT3",          "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 85], "ph": [6.0, 8.0]}},
+    {"id": "wedge1",       "name": "Wedge 1",       "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 85], "ph": [6.0, 8.0]}},
+    {"id": "wedge2",       "name": "Wedge 2",       "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 85], "ph": [6.0, 8.0]}},
+    {"id": "breeder",      "name": "Breeder Bin",   "group": "prod",       "targets": {"temp": [15, 25], "fukt": [60, 85], "ph": [6.0, 8.0]}},
     {"id": "forkompost1",  "name": "Forkompost 1",  "group": "precompost", "targets": {"temp": [55, 80], "fukt": [50, 70], "ph": [6.0, 8.5]}, "threshold": 55, "required": 5},
-    {"id": "forkompost2",  "name": "Forkompost 2",  "group": "precompost", "targets": {"temp": [55, 80], "fukt": [50, 70], "ph": [6.0, 8.5]}, "threshold": 55, "required": 5}
+    {"id": "forkompost2",  "name": "Forkompost 2",  "group": "precompost", "targets": {"temp": [55, 80], "fukt": [50, 70], "ph": [6.0, 8.5]}, "threshold": 55, "required": 5},
+    {"id": "forkompost3",  "name": "Forkompost 3",  "group": "precompost", "targets": {"temp": [55, 80], "fukt": [50, 70], "ph": [6.0, 8.5]}, "threshold": 55, "required": 5}
   ],
 
   "epoch_map": [
@@ -55,6 +55,7 @@
     {"start": "2026-02-01", "end": null, "tab": "production", "bin": 6, "system": "breeder"},
 
     {"start": "2025-07-01", "end": null, "tab": "precompost", "bin": 1, "system": "forkompost1"},
-    {"start": "2025-07-01", "end": null, "tab": "precompost", "bin": 2, "system": "forkompost2"}
+    {"start": "2025-07-01", "end": null, "tab": "precompost", "bin": 2, "system": "forkompost2"},
+    {"start": "2025-07-01", "end": null, "tab": "precompost", "bin": 3, "system": "forkompost3"}
   ]
 }
