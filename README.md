@@ -24,18 +24,38 @@ Interactive React-based visualizations for [Verminord AS](https://verminord.com)
 - Fraunces + Schibsted Grotesk from Google Fonts
 - All content in Norwegian (Bokmal)
 
+## Data Pipeline
+
+A daily sync pulls sensor data from Google Sheets and writes `data.json` for the Storskjerm TV dashboard.
+
+| File | Description |
+|------|-------------|
+| `data.json` | Live sensor data (9 systems, all time ranges) |
+| `mock-data.js` | Offline fallback (`window.VN`) |
+| `scripts/sync_sheet.py` | Python sync: Google Sheet → data.json |
+| `scripts/apps_script_alternative.gs` | Google Apps Script alternative (no service account needed) |
+| `scripts/config.json` | System definitions, column mapping, target ranges |
+| `scripts/test_sync.py` | Offline validation (62 checks) |
+
+**Setup (GitHub Action — daily at 06:00):**
+1. Create a Google Cloud service account with Sheets API access
+2. Share the sheet with the service account email
+3. Add GitHub Secrets: `GOOGLE_SHEET_ID`, `GOOGLE_CREDENTIALS_JSON`
+
+**Setup (Apps Script — simpler alternative):**
+1. In Google Sheet → Extensions → Apps Script, paste `apps_script_alternative.gs`
+2. Set Script Properties: `GITHUB_TOKEN` (repo access), `REPO` (`martin-starr/verminord-interactive`)
+3. Add a daily time trigger for `syncToGitHub()`
+
 ## Hosting
 
-Hosted on Netlify with auto-deploy on push to `main`.
-
-- **Current:** `verminord-interactive.netlify.app`
-- **Planned:** `interaktiv.verminord.no` (pending DNS access)
+Hosted on GitHub Pages from `master` branch.
 
 Embedded on verminord.com via Wix iframe elements.
 
 ## Deploy
 
-Push to `main` — Netlify auto-deploys. No build command needed.
+Push to `master` — GitHub Pages auto-deploys. No build command needed.
 
 ## License
 
